@@ -16,48 +16,167 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 
-.links {
+/* ── Right-side button group ───────────────────────────────── */
+.right {
   display: flex;
   align-items: center;
-  gap: 24px;
-  margin-left: auto;
-  margin-right: 16px;
+  gap: 10px;
 }
 
-.link {
+.loginLink {
   font-size: 14px;
   font-weight: 500;
   color: var(--black);
-  opacity: 0.75;
+  padding: 0 4px;
+  opacity: 0.8;
   transition: opacity 0.15s;
 }
 
-.link:hover {
+.loginLink:hover {
   opacity: 1;
 }
 
-.hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 4px;
+.listBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--black);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 
-.hamburger span {
-  display: block;
-  width: 22px;
-  height: 2px;
+.listBtn:hover {
   background: var(--black);
-  border-radius: 2px;
+  color: var(--white);
 }
 
+/* ── Menu pill + dropdown wrapper ──────────────────────────── */
+.menuWrap {
+  position: relative;
+}
+
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.menuBtn:hover {
+  border-color: #bbb;
+}
+
+.menuBtnOpen {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.menuLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.menuIcon {
+  width: 16px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+/* ── Dropdown popover ──────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.16);
+  padding: 20px 0 8px;
+  z-index: 300;
+}
+
+.dropSection {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+  padding: 0 20px 6px;
+}
+
+.dropLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--black);
+  transition: background 0.12s;
+}
+
+.dropLink:hover {
+  background: var(--gray-bg);
+}
+
+.dropLinkAccent {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.dropLinkAccent:hover {
+  background: var(--gray-bg);
+}
+
+.dropLinkBiz {
+  justify-content: space-between;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.globeIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--black);
+}
+
+.arrowIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.dropDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+/* ── Mobile ────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .links {
+  .loginLink,
+  .listBtn {
     display: none;
+  }
+
+  .dropdown {
+    right: 0;
+    left: auto;
+    min-width: 220px;
   }
 }

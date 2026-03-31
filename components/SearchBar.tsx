@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './SearchBar.module.css';
 
 /* ─── Treatment categories ─────────────────────────────────────────────── */
@@ -325,8 +326,7 @@ export default function SearchBar() {
                   <li key={i}>
                     <Link href="/listele" className={styles.recentRow} onClick={() => setOpen(false)}>
                       {item.type === 'venue' ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={item.img} alt={item.name} className={styles.recentThumb} />
+                        <Image src={item.img} alt={item.name} width={44} height={44} className={styles.recentThumb} unoptimized />
                       ) : (
                         <span className={styles.recentIconWrap} aria-hidden="true">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.recentSearchIcon}>

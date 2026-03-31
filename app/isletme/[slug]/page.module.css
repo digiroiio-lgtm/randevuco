@@ -689,3 +689,341 @@
   }
 }
 
+
+/* ── Package Services ────────────────────────────────────────────────── */
+.packageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.packageCard {
+  position: relative;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--white);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.packageCard:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(91, 61, 232, 0.08);
+}
+
+.packageBadge {
+  position: absolute;
+  top: -1px;
+  right: 16px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 0 0 8px 8px;
+  letter-spacing: 0.02em;
+}
+
+.packageTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.packageName {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding-right: 60px;
+}
+
+.packageDuration {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.clockIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.packageServices {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.packageServiceItem {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  gap: 6px;
+}
+
+.packageServiceItem span {
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.packageBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.packagePriceWrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.packagePrice {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.packageOriginalPrice {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.packageBookBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.packageBookBtn:hover {
+  opacity: 0.85;
+}
+
+/* ── Staff ───────────────────────────────────────────────────────────── */
+.staffGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.staffCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  background: var(--white);
+  text-align: center;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.staffCard:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(91, 61, 232, 0.08);
+}
+
+.staffAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #8b6fee);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.staffInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.staffName {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.staffTitle {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.staffRating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.staffStar {
+  color: var(--star);
+  font-size: 13px;
+}
+
+.staffScore {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Business Tags ───────────────────────────────────────────────────── */
+.tagsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--gray-bg);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--black);
+}
+
+/* ── Loyalty Card ────────────────────────────────────────────────────── */
+.loyaltyCard {
+  margin-top: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fdf8ff 0%, #f5f0ff 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.loyaltyHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loyaltyIcon {
+  font-size: 22px;
+}
+
+.loyaltyTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.loyaltyDesc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: -6px;
+}
+
+.loyaltyTiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.tierBronze {
+  background: rgba(205, 127, 50, 0.1);
+  border: 1px solid rgba(205, 127, 50, 0.25);
+}
+
+.tierSilver {
+  background: rgba(160, 160, 160, 0.1);
+  border: 1px solid rgba(160, 160, 160, 0.25);
+}
+
+.tierGold {
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+.tierIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tierName {
+  font-weight: 700;
+  flex: 1;
+}
+
+.tierPoints {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.referBtn {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: var(--font);
+}
+
+.referBtn:hover {
+  opacity: 0.88;
+}
+
+@media (max-width: 600px) {
+  .packageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .staffGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

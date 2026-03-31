@@ -31,6 +31,33 @@ export type DayHours = {
   hours: string | null;
 };
 
+export type ServicePackage = {
+  name: string;
+  duration: string;
+  price: string;
+  originalPrice?: string;
+  discountPercent?: number;
+  services: string[];
+};
+
+export type StaffMember = {
+  name: string;
+  title: string;
+  rating: number;
+  img?: string;
+};
+
+export type VenueTag =
+  | 'pet-friendly'
+  | 'adults-only'
+  | 'kid-friendly'
+  | 'wheelchair-accessible'
+  | 'parking-available'
+  | 'near-public-transport'
+  | 'environmentally-friendly'
+  | 'black-owned'
+  | 'asian-owned';
+
 export type VenueDetail = {
   slug: string;
   address: string;
@@ -38,6 +65,9 @@ export type VenueDetail = {
   openStatus: string;
   gallery: string[];
   serviceCategories: ServiceCategory[];
+  packages?: ServicePackage[];
+  staff?: StaffMember[];
+  tags?: VenueTag[];
   venueReviews: VenueReview[];
   portfolio: string[];
   openingHours: DayHours[];
@@ -144,8 +174,38 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Gelin Hazırlık Paketi',
+        duration: '3 sa 15 dk',
+        price: '₺2.500',
+        originalPrice: '₺3.100',
+        discountPercent: 19,
+        services: ['Gelin Makyajı', 'Fön & Şekillendirme', 'Manikür', 'Kalıcı Oje'],
+      },
+      {
+        name: 'Renk & Bakım Kombo',
+        duration: '3 sa 30 dk',
+        price: '₺1.800',
+        originalPrice: '₺2.200',
+        discountPercent: 18,
+        services: ['Balayage', 'Saç Bakımı & Maske', 'Fön & Şekillendirme'],
+      },
+      {
+        name: 'Hızlı Tazelenme',
+        duration: '1 sa 15 dk',
+        price: '₺550',
+        services: ['Erkek Saç Kesimi', 'Saç Bakımı & Maske'],
+      },
+    ],
+    staff: [
+      { name: 'Elena Vasil', title: 'Baş Stilist', rating: 5.0 },
+      { name: 'Maria K.', title: 'Renklendirme Uzmanı', rating: 5.0 },
+      { name: 'Sophia D.', title: 'Makyaj Sanatçısı', rating: 4.9 },
+      { name: 'Anna P.', title: 'Saç Bakım Uzmanı', rating: 5.0 },
+    ],
+    tags: ['parking-available', 'near-public-transport', 'wheelchair-accessible', 'environmentally-friendly'],
     venueReviews: [
-      { author: 'Ayşe K.', date: 'Pzt, 30 Mar 2026', rating: 5, text: 'Muhteşem bir deneyim! Stylist çok dikkatli ve profesyoneldi. Saçlarım hiç bu kadar güzel olmamıştı. Kesinlikle tavsiye ederim.' },
       { author: 'Mehmet D.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Çok memnun kaldım. Hem hızlı hem de kaliteli hizmet. Fiyatlar da çok uygun.' },
       { author: 'Zeynep A.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Balayage için geldim, tam istediğim gibi oldu. Teşekkürler!' },
       { author: 'Fatma Y.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Yıllardır gidiyorum, her seferinde aynı mükemmel kalite.' },
@@ -217,9 +277,38 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Komple Güzellik Ritüeli',
+        duration: '3 sa',
+        price: '₺2.200',
+        originalPrice: '₺2.800',
+        discountPercent: 21,
+        services: ['Anti-Aging Bakım', 'Kirpik Uzatma', 'Airbrush Makyaj'],
+      },
+      {
+        name: 'Cilt & Lazer Paketi',
+        duration: '1 sa 45 dk',
+        price: '₺1.400',
+        originalPrice: '₺1.700',
+        discountPercent: 18,
+        services: ['Klasik Yüz Bakımı', 'Lazer Epilasyon (Koltukaltı)'],
+      },
+      {
+        name: 'Hızlı Tazeleme',
+        duration: '1 sa 15 dk',
+        price: '₺900',
+        services: ['Derin Temizleme', 'Gündüz Makyajı'],
+      },
+    ],
+    staff: [
+      { name: 'Katerina V.', title: 'Cilt Bakım Uzmanı', rating: 5.0 },
+      { name: 'Ioanna M.', title: 'Lazer Teknoloji Uzmanı', rating: 5.0 },
+      { name: 'Christos P.', title: 'Makyaj Sanatçısı', rating: 4.9 },
+    ],
+    tags: ['adults-only', 'wheelchair-accessible', 'parking-available', 'near-public-transport'],
     venueReviews: [
-      { author: 'Marina S.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Lazer epilasyon için geldim, çok profesyonel ve hijyenik bir ortam. Sonuçtan çok memnunum!' },
-      { author: 'Nicoleta P.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Anti-aging bakım muhteşemdi. Derim 10 yaş genç göründü!' },
+      { author: 'Nicoleta P.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Anti-aging bakım muhteşemdi. Cildim 10 yaş genç göründü!' },
       { author: 'Elena M.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Kirpik uzatma için geldim. Tam doğal gibi görünüyor, bayıldım.' },
       { author: 'Sophie K.', date: 'Cum, 20 Mar 2026', rating: 5, text: 'My Mall\'daki en iyi güzellik salonu! Her zaman kaliteli hizmet.' },
       { author: 'Rania H.', date: 'Per, 19 Mar 2026', rating: 5, text: 'RF Lift sonuçları inanılmaz. Yüzümde gözle görülür fark var.' },
@@ -291,8 +380,38 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Tam Gün Spa Kaçamağı',
+        duration: '4 sa',
+        price: '₺2.900',
+        originalPrice: '₺3.600',
+        discountPercent: 19,
+        services: ['Türk Hamamı & Kese', 'Sıcak Taş Masajı', 'Anti-Aging Bakım'],
+      },
+      {
+        name: 'Çift Wellness Paketi',
+        duration: '3 sa',
+        price: '₺3.500',
+        originalPrice: '₺4.200',
+        discountPercent: 17,
+        services: ['Aromaterapi Masajı x2', 'Hamam Deneyimi x2'],
+      },
+      {
+        name: 'Hızlı Yenilenme',
+        duration: '1 sa 30 dk',
+        price: '₺1.200',
+        services: ['İsveç Masajı', 'Yüz Bakımı'],
+      },
+    ],
+    staff: [
+      { name: 'Aylin Çelik', title: 'Spa Terapisti', rating: 5.0 },
+      { name: 'Kerem Arslan', title: 'Masaj Terapisti', rating: 4.9 },
+      { name: 'Deniz Yıldız', title: 'Cilt Bakım Uzmanı', rating: 5.0 },
+      { name: 'Seda Kaya', title: 'Hamam Ustası', rating: 5.0 },
+    ],
+    tags: ['adults-only', 'wheelchair-accessible', 'parking-available', 'environmentally-friendly'],
     venueReviews: [
-      { author: 'Zeynep A.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Harika bir spa deneyimi! Sıcak taş masajı muhteşemdi. Personel çok ilgili ve profesyonel. Kesinlikle tekrar geleceğim.' },
       { author: 'Hüseyin K.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Eşimle birlikte çift masaj paketi aldık. İnanılmaz bir deneyimdi, tam anlamıyla rahatlayıp dinlendik.' },
       { author: 'Pınar M.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Hamam ve kese deneyimi mükemmeldi. Uzun zaman sonra bu kadar iyi hissettim.' },
       { author: 'Ali R.', date: 'Cum, 20 Mar 2026', rating: 5, text: 'Deniz manzarası eşliğinde masaj almak ayrı bir his. Kesinlikle tavsiye edilir!' },
@@ -355,8 +474,31 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Medikal Rahatlama Paketi',
+        duration: '2 sa',
+        price: '₺1.300',
+        originalPrice: '₺1.600',
+        discountPercent: 19,
+        services: ['Derin Doku Masajı', 'Refleksoloji'],
+      },
+      {
+        name: 'Spor Toparlanma Paketi',
+        duration: '1 sa 45 dk',
+        price: '₺1.200',
+        originalPrice: '₺1.450',
+        discountPercent: 17,
+        services: ['Spor Masajı', 'Cupping (Hacamat)'],
+      },
+    ],
+    staff: [
+      { name: 'Ahmet Demir', title: 'Medikal Masaj Uzmanı', rating: 5.0 },
+      { name: 'Nilüfer Çetin', title: 'Fizyoterapist', rating: 5.0 },
+      { name: 'Kadir Yılmaz', title: 'Spor Masaj Terapisti', rating: 4.9 },
+    ],
+    tags: ['wheelchair-accessible', 'parking-available', 'near-public-transport'],
     venueReviews: [
-      { author: 'Kemal A.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Kronik bel ağrım için geldim. 5 seans sonra neredeyse tamamen geçti. Gerçekten profesyoneller!' },
       { author: 'Reyhan S.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Spor masajı için geldim, kaslarım tamamen gevşedi. Sonraki koşu için hazırım!' },
       { author: 'Turgut M.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Boyun fıtığı için uygulama yaptırdım, çok faydalı oldu. Teşekkürler.' },
       { author: 'Gülşen Y.', date: 'Cum, 20 Mar 2026', rating: 5, text: 'Lenfatik drenaj masajı için 3. kez geliyorum. Her seferinde çok rahatladım.' },
@@ -417,8 +559,29 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Tai Aromaterapi Deneyimi',
+        duration: '2 sa',
+        price: '₺1.200',
+        originalPrice: '₺1.500',
+        discountPercent: 20,
+        services: ['Klasik Tai Masajı', 'Aromaterapi Masajı'],
+      },
+      {
+        name: 'Çift Ritual Paketi',
+        duration: '1 sa 30 dk',
+        price: '₺1.400',
+        services: ['Çift Tai Masaj Paketi'],
+      },
+    ],
+    staff: [
+      { name: 'Malee T.', title: 'Tai Masaj Uzmanı', rating: 5.0 },
+      { name: 'Somchai P.', title: 'Aromaterapi Uzmanı', rating: 5.0 },
+      { name: 'Niran W.', title: 'Sıcak Taş Terapisti', rating: 4.9 },
+    ],
+    tags: ['kid-friendly', 'parking-available', 'environmentally-friendly', 'asian-owned'],
     venueReviews: [
-      { author: 'Elif K.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Gerçek Tai masajı deneyimi! Terapist çok yetenekli ve geleneksel tekniklere hakim. Antalya\'daki en iyi masaj yeri.' },
       { author: 'Can D.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Aromaterapi masajı için eşimle geldik. Muhteşem bir deneyimdi. Çok rahatladık.' },
       { author: 'Neslihan O.', date: 'Per, 19 Mar 2026', rating: 5, text: 'Ayak masajı için düzenli olarak geliyorum. Her zaman mükemmel.' },
       { author: 'Burak T.', date: 'Çar, 18 Mar 2026', rating: 5, text: 'Full Body Ritual paketini denedim. 2 saat sonunda kendimi yeni doğmuş gibi hissettim!' },
@@ -481,8 +644,31 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Glow & Makyaj Paketi',
+        duration: '2 sa 15 dk',
+        price: '₺1.400',
+        originalPrice: '₺1.700',
+        discountPercent: 18,
+        services: ['Glow Yüz Bakımı', 'Doğal Makyaj'],
+      },
+      {
+        name: 'Gelin Hazırlık Paketi',
+        duration: '3 sa 30 dk',
+        price: '₺2.800',
+        originalPrice: '₺3.400',
+        discountPercent: 18,
+        services: ['Gelin Makyajı', 'Microblading Kaş', 'Kirpik Lifting'],
+      },
+    ],
+    staff: [
+      { name: 'Ceren Aydın', title: 'Cilt & Güzellik Uzmanı', rating: 5.0 },
+      { name: 'Özge Demir', title: 'Kalıcı Makyaj Sanatçısı', rating: 5.0 },
+      { name: 'Tuğba Şen', title: 'Makyaj Sanatçısı', rating: 4.9 },
+    ],
+    tags: ['kid-friendly', 'parking-available', 'near-public-transport', 'environmentally-friendly'],
     venueReviews: [
-      { author: 'Aslı M.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Glow bakımı yaptırdım, yüzüm inanılmaz parlak ve canlı görünüyor. Herkes fark etti!' },
       { author: 'Duygu K.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Microblading için geldim. Sonuç harika, çok doğal görünüyor. Teşekkürler!' },
       { author: 'Sera B.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Makyaj için düzenli geliyorum. Her zaman istediğim gibi çıkıyor.' },
       { author: 'Tuba A.', date: 'Cum, 20 Mar 2026', rating: 5, text: 'Gelin makyajı için geldim, tam hayalimdekileri yaptılar. Çok memnunum!' },
@@ -545,8 +731,46 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Fresh Fade Kombo',
+        duration: '1 sa 20 dk',
+        price: '₺550',
+        originalPrice: '₺650',
+        discountPercent: 15,
+        services: ['Fade Kesim', 'Sakal Düzeltme'],
+      },
+      {
+        name: 'Klasik Beyefendi Paketi',
+        duration: '1 sa 30 dk',
+        price: '₺680',
+        originalPrice: '₺830',
+        discountPercent: 18,
+        services: ['Saç Kesimi', 'Klasik Ustura Tıraşı', 'Saç & Saç Derisi Bakımı'],
+      },
+      {
+        name: 'Sıcak Havlu Deneyimi',
+        duration: '1 sa',
+        price: '₺480',
+        services: ['Saç Kesimi', 'Sıcak Havlu Tıraş'],
+      },
+      {
+        name: 'Baba & Oğul Paketi',
+        duration: '50 dk',
+        price: '₺380',
+        originalPrice: '₺430',
+        discountPercent: 12,
+        services: ['Erkek Saç Kesimi', 'Çocuk Saç Kesimi (Ücretsiz)'],
+      },
+    ],
+    staff: [
+      { name: 'Cem Arslan', title: 'Baş Berber', rating: 5.0 },
+      { name: 'Tarık Yıldız', title: 'Fade Uzmanı', rating: 4.9 },
+      { name: 'Onur Kaplan', title: 'Saç & Sakal Stili', rating: 4.8 },
+      { name: 'Berk Şahin', title: 'Klasik Ustura Tıraş Uzmanı', rating: 5.0 },
+    ],
+    tags: ['kid-friendly', 'parking-available', 'near-public-transport'],
     venueReviews: [
-      { author: 'Mert D.', date: 'Pzt, 30 Mar 2026', rating: 5, text: 'En iyi berber deneyimim kesinlikle! Fade kesim mükemmel oldu. Personel hem profesyonel hem de çok samimi.' },
       { author: 'Emre K.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Klasik ustura tıraşı için geldim, tam film sahnesi gibiydi. Harika bir deneyim!' },
       { author: 'Serkan A.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Her hafta geliyorum. Saç & sakal kombo paketi çok değerli.' },
       { author: 'Mustafa Y.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Sıcak havlu tıraşı denedim, ilk kez bu kadar rahatlamıştım. Harikasınız!' },
@@ -610,8 +834,37 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Manikür & Pedikür Kombo',
+        duration: '1 sa 45 dk',
+        price: '₺700',
+        originalPrice: '₺850',
+        discountPercent: 18,
+        services: ['Jel Manikür', 'Spa Pedikür'],
+      },
+      {
+        name: 'Nail Art Premium Paketi',
+        duration: '2 sa 30 dk',
+        price: '₺1.150',
+        originalPrice: '₺1.400',
+        discountPercent: 18,
+        services: ['Tırnak Uzatma (Jel)', 'Nail Art (Tam Set)'],
+      },
+      {
+        name: 'Hızlı Bakım',
+        duration: '45 dk',
+        price: '₺300',
+        services: ['Klasik Manikür'],
+      },
+    ],
+    staff: [
+      { name: 'Pınar Coşkun', title: 'Nail Artist', rating: 5.0 },
+      { name: 'Ece Yılmaz', title: 'Tırnak Uzatma Uzmanı', rating: 4.9 },
+      { name: 'Selin Kara', title: 'Manikür & Pedikür Uzmanı', rating: 5.0 },
+    ],
+    tags: ['kid-friendly', 'wheelchair-accessible', 'parking-available'],
     venueReviews: [
-      { author: 'Gamze S.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Nail art için geldim, tam hayal ettiğim gibi oldu. Çok detaylı ve özenli çalışıyorlar!' },
       { author: 'Büşra A.', date: 'Sal, 24 Mar 2026', rating: 5, text: 'Jel manikür çok uzun sürdü ama mükemmel bir iş çıktı. Değdi!' },
       { author: 'Melis K.', date: 'Pzt, 23 Mar 2026', rating: 5, text: 'Spa pedikür harika! Ayaklarım ipek gibi oldu.' },
       { author: 'Cansu Y.', date: 'Cum, 20 Mar 2026', rating: 5, text: 'Fransız manikür için en iyi yer. Her zaman mükemmel sonuç.' },
@@ -674,8 +927,37 @@ export const venueDetails: Record<string, VenueDetail> = {
         ],
       },
     ],
+    packages: [
+      {
+        name: 'Saç Boyama & Bakım Paketi',
+        duration: '2 sa 15 dk',
+        price: '₺800',
+        originalPrice: '₺1.000',
+        discountPercent: 20,
+        services: ['Saç Boyama', 'Saç Bakımı & Maske'],
+      },
+      {
+        name: 'Balayage & Fön Paketi',
+        duration: '3 sa',
+        price: '₺1.200',
+        originalPrice: '₺1.500',
+        discountPercent: 20,
+        services: ['Balayage / Ombre', 'Fön & Şekillendirme'],
+      },
+      {
+        name: 'Hızlı Güzellik',
+        duration: '55 dk',
+        price: '₺380',
+        services: ['Kadın Saç Kesimi', 'Kaş Şekillendirme'],
+      },
+    ],
+    staff: [
+      { name: 'Fatma Özdemir', title: 'Baş Stilist', rating: 5.0 },
+      { name: 'Merve Aktaş', title: 'Renklendirme Uzmanı', rating: 4.8 },
+      { name: 'Serap Güneş', title: 'Güzellik Uzmanı', rating: 4.9 },
+    ],
+    tags: ['kid-friendly', 'parking-available', 'near-public-transport'],
     venueReviews: [
-      { author: 'Hatice D.', date: 'Pzt, 30 Mar 2026', rating: 5, text: 'Yıllardır gidiyorum ve her seferinde memnun çıkıyorum. Uygun fiyat kaliteli hizmet demek burada.' },
       { author: 'Şule A.', date: 'Per, 26 Mar 2026', rating: 5, text: 'Balayage için geldim, renk çok güzel tuttu. Kesinlikle tavsiye ederim.' },
       { author: 'Nurcan K.', date: 'Sal, 24 Mar 2026', rating: 4, text: 'Saç kesimi ve bakımdan çok memnunum. Ağda için de geliyorum artık.' },
       { author: 'Feyza M.', date: 'Per, 19 Mar 2026', rating: 5, text: 'Keratin bakımı muhteşemdi. Saçlarım çok güzel düzeldi.' },

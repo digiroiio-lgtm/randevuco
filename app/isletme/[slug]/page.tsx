@@ -26,6 +26,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const TAG_LABELS: Record<string, { icon: string; label: string }> = {
+  'pet-friendly':           { icon: '🐾', label: 'Evcil Hayvan Dostu' },
+  'adults-only':            { icon: '🔞', label: 'Sadece Yetişkinler' },
+  'kid-friendly':           { icon: '👶', label: 'Çocuk Dostu' },
+  'wheelchair-accessible':  { icon: '♿', label: 'Tekerlekli Sandalye Erişimi' },
+  'parking-available':      { icon: '🅿️', label: 'Otopark Mevcut' },
+  'near-public-transport':  { icon: '🚌', label: 'Toplu Taşıma Yakını' },
+  'environmentally-friendly':{ icon: '🌿', label: 'Çevre Dostu' },
+  'black-owned':            { icon: '✊', label: 'Siyahi Sahipli' },
+  'asian-owned':            { icon: '🌏', label: 'Asyalı Sahipli' },
+};
+
 export default async function VenueDetailPage({ params }: Props) {
   const { slug } = await params;
   const venue = allVenues.find((v) => v.slug === slug);
@@ -41,6 +53,13 @@ export default async function VenueDetailPage({ params }: Props) {
   const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(
     detail?.address ?? venue.location
   )}`;
+
+  const packages = detail?.packages ?? [];
+  const staff = detail?.staff ?? [];
+  const tags = detail?.tags ?? [];
+  const hasPackages = packages.length > 0;
+  const hasStaff = staff.length > 0;
+  const hasTags = tags.length > 0;
 
   return (
     <>
@@ -104,6 +123,12 @@ export default async function VenueDetailPage({ params }: Props) {
             <div className={styles.anchorLinks}>
               <a href="#photos" className={styles.anchorLink}>Fotoğraflar</a>
               <a href="#services" className={styles.anchorLink}>Hizmetler</a>
+              {hasPackages && (
+                <a href="#packages" className={styles.anchorLink}>Paketler</a>
+              )}
+              {hasStaff && (
+                <a href="#staff" className={styles.anchorLink}>Ekip</a>
+              )}
               <a href="#reviews" className={styles.anchorLink}>Değerlendirmeler</a>
               <a href="#portfolio" className={styles.anchorLink}>Portfolyo</a>
               <a href="#about" className={styles.anchorLink}>Hakkında</a>
@@ -167,6 +192,76 @@ export default async function VenueDetailPage({ params }: Props) {
                   <p className={styles.emptyMsg}>Hizmet bilgisi mevcut değil.</p>
                 )}
               </section>
+
+              {/* ── Package Services ── */}
+              {hasPackages && (
+                <section id="packages" className={styles.section}>
+                  <h2 className={styles.sectionTitle}>Paket Hizmetler</h2>
+                  <div className={styles.packageGrid}>
+                    {packages.map((pkg) => (
+                      <div key={pkg.name} className={styles.packageCard}>
+                        {pkg.discountPercent && (
+                          <span className={styles.packageBadge}>
+                            %{pkg.discountPercent} İndirim
+                          </span>
+                        )}
+                        <div className={styles.packageTop}>
+                          <p className={styles.packageName}>{pkg.name}</p>
+                          <p className={styles.packageDuration}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.clockIcon} aria-hidden="true">
+                              <circle cx="12" cy="12" r="10" />
+                              <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            {pkg.duration}
+                          </p>
+                          <ul className={styles.packageServices}>
+                            {pkg.services.map((s) => (
+                              <li key={s} className={styles.packageServiceItem}>
+                                <span aria-hidden="true">✓</span> {s}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className={styles.packageBottom}>
+                          <div className={styles.packagePriceWrap}>
+                            <span className={styles.packagePrice}>{pkg.price}</span>
+                            {pkg.originalPrice && (
+                              <span className={styles.packageOriginalPrice}>{pkg.originalPrice}</span>
+                            )}
+                          </div>
+                          <Link href={`/randevu-al/${slug}`} className={styles.packageBookBtn}>
+                            Rezerve Et
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* ── Staff ── */}
+              {hasStaff && (
+                <section id="staff" className={styles.section}>
+                  <h2 className={styles.sectionTitle}>Ekip</h2>
+                  <div className={styles.staffGrid}>
+                    {staff.map((member) => (
+                      <div key={member.name} className={styles.staffCard}>
+                        <div className={styles.staffAvatar} aria-hidden="true">
+                          {member.name.charAt(0)}
+                        </div>
+                        <div className={styles.staffInfo}>
+                          <p className={styles.staffName}>{member.name}</p>
+                          <p className={styles.staffTitle}>{member.title}</p>
+                          <div className={styles.staffRating} aria-label={`${member.rating} yıldız`}>
+                            <span className={styles.staffStar} aria-hidden="true">★</span>
+                            <span className={styles.staffScore}>{member.rating.toFixed(1)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Reviews */}
               <section id="reviews" className={styles.section}>
@@ -239,6 +334,22 @@ export default async function VenueDetailPage({ params }: Props) {
                     `${venue.name}, ${venue.location} bölgesinde profesyonel ${venue.type.toLowerCase()} hizmetleri sunmaktadır. Deneyimli ekibimiz ve modern ekipmanlarımızla size en iyi hizmeti vermeyi hedefliyoruz.`}
                 </p>
 
+                {hasTags && (
+                  <div className={styles.tagsBlock}>
+                    <h3 className={styles.subTitle}>İşletme Özellikleri</h3>
+                    <div className={styles.tagsList}>
+                      {tags.map((tag) => {
+                        const t = TAG_LABELS[tag];
+                        return t ? (
+                          <span key={tag} className={styles.tagChip}>
+                            <span aria-hidden="true">{t.icon}</span> {t.label}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {detail?.openingHours && (
                   <div className={styles.hoursBlock}>
                     <h3 className={styles.subTitle}>Çalışma Saatleri</h3>
@@ -304,6 +415,37 @@ export default async function VenueDetailPage({ params }: Props) {
                   </a>
                 </div>
               </div>
+
+              {/* Loyalty Program */}
+              <div className={styles.loyaltyCard}>
+                <div className={styles.loyaltyHeader}>
+                  <span className={styles.loyaltyIcon} aria-hidden="true">🎁</span>
+                  <h3 className={styles.loyaltyTitle}>Sadakat Programı</h3>
+                </div>
+                <p className={styles.loyaltyDesc}>
+                  Her randevuda puan kazan, ödüllere ulaş!
+                </p>
+                <div className={styles.loyaltyTiers}>
+                  <div className={`${styles.tier} ${styles.tierBronze}`}>
+                    <span className={styles.tierIcon} aria-hidden="true">🥉</span>
+                    <span className={styles.tierName}>Bronz</span>
+                    <span className={styles.tierPoints}>0–499 puan</span>
+                  </div>
+                  <div className={`${styles.tier} ${styles.tierSilver}`}>
+                    <span className={styles.tierIcon} aria-hidden="true">🥈</span>
+                    <span className={styles.tierName}>Gümüş</span>
+                    <span className={styles.tierPoints}>500–999 puan</span>
+                  </div>
+                  <div className={`${styles.tier} ${styles.tierGold}`}>
+                    <span className={styles.tierIcon} aria-hidden="true">🥇</span>
+                    <span className={styles.tierName}>Altın</span>
+                    <span className={styles.tierPoints}>1000+ puan</span>
+                  </div>
+                </div>
+                <button type="button" className={styles.referBtn}>
+                  👥 Arkadaşını Davet Et
+                </button>
+              </div>
             </aside>
           </div>
         </div>
@@ -355,4 +497,3 @@ export default async function VenueDetailPage({ params }: Props) {
     </>
   );
 }
-

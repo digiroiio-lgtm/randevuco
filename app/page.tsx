@@ -4,6 +4,7 @@ import Nav from '@/components/Nav';
 import VenueCard from '@/components/VenueCard';
 import CategoryCard from '@/components/CategoryCard';
 import ReviewCard from '@/components/ReviewCard';
+import BookingCounter from '@/components/BookingCounter';
 import { venues, categories, reviews } from '@/lib/data';
 import styles from './page.module.css';
 
@@ -38,6 +39,7 @@ export default function HomePage() {
                 Ara
               </Link>
             </div>
+            <BookingCounter />
           </div>
         </section>
 

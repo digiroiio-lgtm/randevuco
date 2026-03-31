@@ -10,12 +10,13 @@
 }
 
 .heroTitle {
-  font-family: var(--font-playfair), Georgia, serif;
+  font-family: var(--font);
   font-size: clamp(36px, 6vw, 64px);
   font-weight: 900;
   color: var(--black);
   line-height: 1.1;
   margin-bottom: 16px;
+  letter-spacing: -0.02em;
 }
 
 .heroSub {
@@ -25,71 +26,29 @@
   line-height: 1.6;
 }
 
-.searchBar {
-  display: flex;
+.getAppBtn {
+  display: inline-flex;
   align-items: center;
-  gap: 0;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 14px 28px;
   background: var(--white);
+  color: var(--black);
   border-radius: 50px;
-  padding: 6px 6px 6px 4px;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.12);
-  max-width: 780px;
-  margin: 0 auto;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.15s;
 }
 
-.searchSegment {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 50px;
-  transition: background 0.15s;
-  min-width: 0;
+.getAppBtn:hover {
+  opacity: 0.85;
 }
 
-.searchSegment:hover {
-  background: #f5f5f5;
-}
-
-.searchIcon {
+.getAppIcon {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  color: var(--black);
-}
-
-.searchLabel {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.searchDivider {
-  width: 1px;
-  height: 24px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-.searchBtn {
-  padding: 12px 28px;
-  background: var(--black);
-  color: var(--white);
-  border-radius: 50px;
-  font-size: 15px;
-  font-weight: 700;
-  transition: opacity 0.15s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.searchBtn:hover {
-  opacity: 0.8;
 }
 
 .section {
@@ -206,27 +165,8 @@
 }
 
 @media (max-width: 600px) {
-  .searchBar {
-    flex-wrap: wrap;
-    border-radius: 20px;
-    padding: 8px;
-    gap: 4px;
-  }
-
-  .searchSegment {
-    flex: 1 1 auto;
-    min-width: 120px;
-    padding: 10px 14px;
-  }
-
-  .searchDivider {
-    display: none;
-  }
-
-  .searchBtn {
-    width: 100%;
-    text-align: center;
-    margin-top: 4px;
-    padding: 12px;
+  .getAppBtn {
+    font-size: 14px;
+    padding: 12px 20px;
   }
 }

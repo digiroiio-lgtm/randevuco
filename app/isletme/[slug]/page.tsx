@@ -230,7 +230,7 @@ export default async function VenueDetailPage({ params }: Props) {
                             )}
                           </div>
                           <Link href={`/randevu-al/${slug}`} className={styles.packageBookBtn}>
-                            Rezerve Et
+                            Randevu Al
                           </Link>
                         </div>
                       </div>
@@ -394,7 +394,7 @@ export default async function VenueDetailPage({ params }: Props) {
                 <div className={styles.sideActions}>
                   <button type="button" className={styles.dealsBtn}>Fırsatlar</button>
                   <Link href={`/randevu-al/${slug}`} className={styles.bookNowBtn}>
-                    Rezerve Et
+                    Randevu Al
                   </Link>
                 </div>
                 <div className={styles.sideInfo}>

@@ -52,7 +52,7 @@ export default function ServiceTabs({ categories, venueSlug }: Props) {
             <div className={styles.serviceRight}>
               <span className={styles.price}>{item.price}</span>
               <Link href={`/randevu-al/${venueSlug}`} className={styles.bookBtn}>
-                Rezerve Et
+                Randevu Al
               </Link>
             </div>
           </div>

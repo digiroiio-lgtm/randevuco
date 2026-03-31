@@ -1,0 +1,691 @@
+/* ── Breadcrumb ─────────────────────────────────────────────────────── */
+.breadcrumbBar {
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+  padding: 12px 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.breadcrumb a {
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.breadcrumb a:hover {
+  color: var(--black);
+  text-decoration: underline;
+}
+
+.breadcrumb span:last-child {
+  color: var(--black);
+  font-weight: 500;
+}
+
+/* ── Photo Gallery ─────────────────────────────────────────────────── */
+.gallery {
+  position: relative;
+  background: var(--gray-card);
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  height: 480px;
+  gap: 4px;
+}
+
+.galleryMain {
+  position: relative;
+  overflow: hidden;
+}
+
+.gallerySide {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+}
+
+.gallerySideImg {
+  position: relative;
+  overflow: hidden;
+}
+
+.galleryImg {
+  object-fit: cover;
+}
+
+.seeAllImgBtn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: var(--font);
+}
+
+.seeAllImgBtn:hover {
+  background: var(--gray-bg);
+}
+
+/* ── Anchor Nav ────────────────────────────────────────────────────── */
+.anchorNav {
+  position: sticky;
+  top: 57px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  z-index: 90;
+}
+
+.anchorLinks {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.anchorLinks::-webkit-scrollbar {
+  display: none;
+}
+
+.anchorLink {
+  display: inline-block;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.anchorLink:hover {
+  color: var(--black);
+  border-bottom-color: var(--black);
+}
+
+/* ── Container & Layout ────────────────────────────────────────────── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 48px;
+  padding: 40px 0 64px;
+  align-items: start;
+}
+
+/* ── Main Column ───────────────────────────────────────────────────── */
+.mainCol {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  min-width: 0;
+}
+
+/* ── Header Section ────────────────────────────────────────────────── */
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.venueName {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stars {
+  color: var(--star);
+  font-size: 16px;
+  letter-spacing: -1px;
+}
+
+.ratingScore {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ratingCount {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.openBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.openDot {
+  font-size: 9px;
+}
+
+.metaSep {
+  color: var(--muted);
+}
+
+.metaAddress {
+  color: var(--muted);
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: var(--font);
+}
+
+.actionBtn:hover {
+  border-color: var(--black);
+  background: var(--gray-bg);
+}
+
+/* ── Sections ──────────────────────────────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.subTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.emptyMsg {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ── Reviews ────────────────────────────────────────────────────────── */
+.ratingBanner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.ratingBig {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.starsLg {
+  color: var(--star);
+  font-size: 20px;
+  letter-spacing: -1px;
+}
+
+.ratingBigCount {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.reviewCard {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.reviewAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.reviewBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.reviewMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reviewAuthor {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.reviewDate {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.reviewStars {
+  color: var(--star);
+  font-size: 13px;
+}
+
+.reviewText {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.seeAllBtn {
+  align-self: flex-start;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.seeAllBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Portfolio ──────────────────────────────────────────────────────── */
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.portfolioItem {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.portfolioImg {
+  object-fit: cover;
+}
+
+/* ── About ──────────────────────────────────────────────────────────── */
+.aboutText {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.hoursBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hoursList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hoursRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.hoursDay {
+  font-weight: 600;
+}
+
+.hoursTime {
+  color: var(--muted);
+}
+
+.closed {
+  font-style: italic;
+}
+
+.additionalInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.infoChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.infoChip {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--gray-bg);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.infoAddress {
+  font-size: 14px;
+  color: var(--muted);
+  font-style: normal;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 120px;
+  align-self: flex-start;
+}
+
+.sideCard {
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--white);
+}
+
+.sideVenueName {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.sideRating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sideStar {
+  color: var(--star);
+  font-size: 16px;
+}
+
+.sideScore {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sideCount {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.sideActions {
+  display: flex;
+  gap: 10px;
+}
+
+.dealsBtn {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  font-family: var(--font);
+}
+
+.dealsBtn:hover {
+  border-color: var(--black);
+}
+
+.bookNowBtn {
+  flex: 1;
+  display: block;
+  padding: 12px;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+
+.bookNowBtn:hover {
+  opacity: 0.85;
+}
+
+.sideInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.sideOpenStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.openDotGreen {
+  font-size: 8px;
+}
+
+.sideAddress {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.directionsLink {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ── Nearby Venues ──────────────────────────────────────────────────── */
+.nearbySection {
+  padding: 48px 0;
+  background: var(--gray-bg);
+}
+
+.nearbySectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.nearbyRow {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.nearbyRow::-webkit-scrollbar {
+  display: none;
+}
+
+.nearbyCard {
+  flex: 0 0 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.nearbyCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.nearbyImgWrap {
+  position: relative;
+  height: 130px;
+  overflow: hidden;
+}
+
+.nearbyImg {
+  object-fit: cover;
+}
+
+.nearbyInfo {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nearbyName {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.nearbyRatingRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.nearbyStar {
+  color: var(--star);
+}
+
+.nearbyCount {
+  color: var(--muted);
+}
+
+.nearbyLoc {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.nearbyType {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--gray-bg);
+  padding: 28px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .galleryGrid {
+    grid-template-columns: 1fr;
+    height: 280px;
+  }
+
+  .gallerySide {
+    display: none;
+  }
+
+  .sidebar {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolioGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .anchorLink {
+    padding: 14px 14px;
+    font-size: 13px;
+  }
+}
+

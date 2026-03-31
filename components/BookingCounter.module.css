@@ -1,0 +1,63 @@
+/* ── Wrapper line ── */
+.line {
+  margin-top: 20px;
+  font-size: 15px;
+  color: var(--muted);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+  user-select: none;
+}
+
+/* ── Bold number ── */
+.number {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--black);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  /* Keep the counter width stable so surrounding text doesn't jump. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+
+/* ── Thousands-separator character ── */
+.sep {
+  display: inline-block;
+}
+
+/* ── Single digit slot (clip box) ── */
+.slot {
+  display: inline-block;
+  overflow: hidden;
+  /* Height matches the line-height of .number so the clip is tight. */
+  height: 1.25em;
+  vertical-align: bottom;
+  position: relative;
+}
+
+/* ── The digit itself (animated on remount via key change) ── */
+.roll {
+  display: inline-block;
+  animation: rollUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes rollUp {
+  from {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── Trailing label ── */
+.label {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--muted);
+}

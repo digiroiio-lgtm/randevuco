@@ -1,0 +1,248 @@
+.flow {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stepDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--gray-card);
+  color: var(--muted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.stepDot.active {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.serviceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  font-size: 14px;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.serviceItem:hover {
+  border-color: var(--accent);
+}
+
+.serviceItem.selected {
+  border-color: var(--accent);
+  background: #f3f0ff;
+}
+
+.serviceName {
+  font-weight: 600;
+}
+
+.serviceMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dateList {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dateBtn {
+  padding: 8px 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--white);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dateBtn:hover {
+  border-color: var(--accent);
+}
+
+.dateBtn.selected {
+  border-color: var(--accent);
+  background: #f3f0ff;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.timeBtn {
+  padding: 10px 6px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--white);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.timeBtn:hover {
+  border-color: var(--accent);
+}
+
+.timeBtn.selected {
+  border-color: var(--accent);
+  background: #f3f0ff;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+.summary {
+  background: var(--gray-bg);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.navRow {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.btnOutline {
+  padding: 14px 20px;
+  background: none;
+  color: var(--black);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.btnOutline:hover {
+  background: var(--gray-bg);
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.successIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--white);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.successTitle {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.successText {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 340px;
+}

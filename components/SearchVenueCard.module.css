@@ -1,0 +1,161 @@
+.card {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  cursor: default;
+}
+
+.card:hover {
+  background: #fafafa;
+}
+
+/* ── Photo ── */
+.imgLink {
+  display: block;
+}
+
+.imgWrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: var(--gray-card);
+}
+
+.img {
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.card:hover .img {
+  transform: scale(1.03);
+}
+
+.featuredBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--white);
+  color: var(--black);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.02em;
+}
+
+/* ── Body ── */
+.body {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nameRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.ratingWrap {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.star {
+  color: var(--star);
+  font-size: 14px;
+}
+
+.score {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.location {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* ── Service rows ── */
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+
+.serviceLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.serviceName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.serviceDuration {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.servicePrice {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── See all ── */
+.seeAll {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.seeAll:hover {
+  text-decoration: underline;
+}

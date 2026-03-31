@@ -1,77 +1,181 @@
-.header {
-  background: var(--gray-bg);
-  padding: 48px 20px 32px;
+/* ── Layout offsets ─────────────────────────────────────────────────────── */
+/* nav (57px) + toolbar (~58px) */
+.searchRoot {
+  --panel-offset: 115px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.title {
-  font-size: clamp(24px, 4vw, 36px);
-  font-weight: 700;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.filters {
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
-  position: sticky;
-  top: 56px;
-  background: var(--white);
-  z-index: 10;
-}
-
-.filterRow {
+/* ── Page wrapper ─────────────────────────────────────────────────────── */
+.main {
+  min-height: calc(100vh - 57px);
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px;
+  flex-direction: column;
 }
 
-.filterRow::-webkit-scrollbar {
-  display: none;
+/* ── Search root ───────────────────────────────────────────────────────── */
+.searchRoot {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.filterBtn {
-  flex: 0 0 auto;
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  border-radius: 50px;
+/* ── Toolbar ───────────────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
   background: var(--white);
+  position: sticky;
+  top: 57px;
+  z-index: 80;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Venues / Professionals toggle */
+.toggleGroup {
+  display: flex;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.toggleBtn {
+  padding: 7px 16px;
   font-size: 13px;
-  font-weight: 500;
-  transition: background 0.15s, border-color 0.15s;
-  white-space: nowrap;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--muted);
+  border: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
 }
 
-.filterBtn:hover {
-  background: var(--gray-bg);
+.toggleBtn + .toggleBtn {
+  border-left: 1.5px solid var(--border);
+}
+
+.toggleActive {
+  background: var(--black);
+  color: var(--white);
+}
+
+.venueCount {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.filterBtn,
+.mapToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.filterBtn:hover,
+.mapToggleBtn:hover {
   border-color: var(--black);
+  background: var(--gray-bg);
 }
 
-.listSection {
-  padding: 40px 0 64px;
+.filterIcon {
+  width: 15px;
+  height: 15px;
 }
 
-.grid {
+/* ── Split panel ───────────────────────────────────────────────────────── */
+.splitPanel {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
 }
 
+.splitPanel.noMap {
+  grid-template-columns: 1fr;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Left: scrollable list */
+.listCol {
+  overflow-y: auto;
+  height: calc(100vh - var(--panel-offset));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Right: sticky map */
+.mapCol {
+  position: sticky;
+  top: var(--panel-offset);
+  height: calc(100vh - var(--panel-offset));
+  overflow: hidden;
+  background: var(--gray-bg);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
 .footer {
   background: var(--gray-bg);
   padding: 28px 20px;
   text-align: center;
   font-size: 13px;
   color: var(--muted);
+}
+
+.footerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .splitPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .mapCol {
+    position: static;
+    height: 380px;
+    top: auto;
+  }
+
+  .listCol {
+    height: auto;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .venueCount {
+    display: none;
+  }
 }

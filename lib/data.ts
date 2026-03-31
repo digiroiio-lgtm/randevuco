@@ -6,6 +6,9 @@ export type Venue = {
   location: string;
   type: string;
   img: string;
+  featured?: boolean;
+  lat?: number;
+  lng?: number;
 };
 
 export type ServiceItem = {
@@ -81,19 +84,19 @@ export type Category = {
 
 export const venues: Record<string, Venue[]> = {
   recommended: [
-    { slug: 'medloft-beauty', name: 'Medloft Beauty Couture', rating: 5.0, reviews: 977, location: 'Germasogeia, Limassol', type: 'Kuaför Salonu', img: 'photo-1560066984-138dadb4c035' },
-    { slug: 'wow-beauty-lab', name: 'Wow Beauty Lab', rating: 5.0, reviews: 1507, location: 'My Mall, Franklin R.', type: 'Güzellik Salonu', img: 'photo-1522337360788-8b13dee7a37e' },
-    { slug: 'luxe-spa', name: 'Luxe Spa & Wellness', rating: 4.9, reviews: 342, location: 'Konyaaltı, Antalya', type: 'Spa', img: 'photo-1516975080664-ed2fc6a32937' },
+    { slug: 'medloft-beauty', name: 'Medloft Beauty Couture', rating: 5.0, reviews: 977, location: 'Konyaaltı, Antalya', type: 'Kuaför Salonu', img: 'photo-1560066984-138dadb4c035', featured: true, lat: 36.8777, lng: 30.6479 },
+    { slug: 'wow-beauty-lab', name: 'Wow Beauty Lab', rating: 5.0, reviews: 1507, location: 'Muratpaşa, Antalya', type: 'Güzellik Salonu', img: 'photo-1522337360788-8b13dee7a37e', featured: true, lat: 36.8893, lng: 30.7133 },
+    { slug: 'luxe-spa', name: 'Luxe Spa & Wellness', rating: 4.9, reviews: 342, location: 'Konyaaltı, Antalya', type: 'Spa', img: 'photo-1516975080664-ed2fc6a32937', featured: false, lat: 36.8760, lng: 30.6530 },
   ],
   newVenues: [
-    { slug: 'zengate-masaj', name: 'Zengate Medikal Masaj 2 – Derin İyileşme', rating: 5.0, reviews: 5, location: 'Gençlik, 1315. Sokak 5a, Antalya', type: 'Masaj', img: 'photo-1570172619644-dfd03ed5d881' },
-    { slug: 'my-thai-masaj', name: 'My Thai Masaj', rating: 5.0, reviews: 26, location: 'Elmalı, 4. Sokak, Antalya', type: 'Masaj', img: 'photo-1544161515-4ab6ce6db874' },
-    { slug: 'glow-beauty', name: 'Glow Beauty Studio', rating: 5.0, reviews: 3, location: 'Lara, Antalya', type: 'Güzellik Salonu', img: 'photo-1487412947147-5cebf100ffc2' },
+    { slug: 'zengate-masaj', name: 'Zengate Medikal Masaj 2 – Derin İyileşme', rating: 5.0, reviews: 5, location: 'Muratpaşa, Antalya', type: 'Masaj', img: 'photo-1570172619644-dfd03ed5d881', featured: false, lat: 36.8870, lng: 30.7080 },
+    { slug: 'my-thai-masaj', name: 'My Thai Masaj', rating: 5.0, reviews: 26, location: 'Muratpaşa, Antalya', type: 'Masaj', img: 'photo-1544161515-4ab6ce6db874', featured: false, lat: 36.8855, lng: 30.7050 },
+    { slug: 'glow-beauty', name: 'Glow Beauty Studio', rating: 5.0, reviews: 3, location: 'Lara, Antalya', type: 'Güzellik Salonu', img: 'photo-1487412947147-5cebf100ffc2', featured: false, lat: 36.8755, lng: 30.7850 },
   ],
   trending: [
-    { slug: 'the-barber-room', name: 'The Barber Room', rating: 4.8, reviews: 214, location: 'Muratpaşa, Antalya', type: 'Berber', img: 'photo-1519415510236-718bdfcd89c8' },
-    { slug: 'nail-art-atelier', name: 'Nail Art Atelier', rating: 4.9, reviews: 88, location: 'Lara, Antalya', type: 'Tırnak', img: 'photo-1604654894610-df63bc536371' },
-    { slug: 'stil-sac', name: 'Stil Saç & Güzellik', rating: 4.7, reviews: 156, location: 'Kepez, Antalya', type: 'Kuaför', img: 'photo-1560066984-138dadb4c035' },
+    { slug: 'the-barber-room', name: 'The Barber Room', rating: 4.8, reviews: 214, location: 'Muratpaşa, Antalya', type: 'Berber', img: 'photo-1519415510236-718bdfcd89c8', featured: true, lat: 36.8910, lng: 30.7200 },
+    { slug: 'nail-art-atelier', name: 'Nail Art Atelier', rating: 4.9, reviews: 88, location: 'Lara, Antalya', type: 'Tırnak', img: 'photo-1604654894610-df63bc536371', featured: false, lat: 36.8740, lng: 30.7900 },
+    { slug: 'stil-sac', name: 'Stil Saç & Güzellik', rating: 4.7, reviews: 156, location: 'Kepez, Antalya', type: 'Kuaför', img: 'photo-1560066984-138dadb4c035', featured: false, lat: 36.9244, lng: 30.7143 },
   ],
 };
 

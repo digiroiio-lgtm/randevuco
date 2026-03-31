@@ -30,7 +30,7 @@ export default function HomePage() {
               <input
                 className={styles.searchInput}
                 type="text"
-                placeholder="Hizmet, isletme veya konum ara…"
+                placeholder="Hizmet, işletme veya konum ara…"
                 aria-label="Arama"
                 readOnly
               />

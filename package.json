@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@fontsource/playfair-display": "^5.2.8",
-    "next": "14.2.0",
+    "next": "^14.2.35",
     "react": "^18",
     "react-dom": "^18"
   },

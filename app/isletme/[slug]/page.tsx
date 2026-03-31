@@ -7,7 +7,7 @@ import { allVenues } from '@/lib/data';
 import styles from './page.module.css';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const venue = allVenues.find((v) => v.slug === params.slug);
+  const { slug } = await params;
+  const venue = allVenues.find((v) => v.slug === slug);
   if (!venue) return { title: 'İşletme Bulunamadı – Randevu.' };
   return {
     title: `${venue.name} – Randevu.`,
@@ -30,8 +31,9 @@ const mockServices = [
   { name: 'Saç Bakımı', duration: '60 dk', price: '₺350' },
 ];
 
-export default function VenueDetailPage({ params }: Props) {
-  const venue = allVenues.find((v) => v.slug === params.slug);
+export default async function VenueDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const venue = allVenues.find((v) => v.slug === slug);
   if (!venue) notFound();
 
   return (

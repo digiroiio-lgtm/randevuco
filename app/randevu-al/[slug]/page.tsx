@@ -7,7 +7,7 @@ import { allVenues } from '@/lib/data';
 import styles from './page.module.css';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const venue = allVenues.find((v) => v.slug === params.slug);
+  const { slug } = await params;
+  const venue = allVenues.find((v) => v.slug === slug);
   if (!venue) return { title: 'Randevu Al – Randevu.' };
   return {
     title: `Randevu Al – ${venue.name} | Randevu.`,
@@ -23,8 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function BookingPage({ params }: Props) {
-  const venue = allVenues.find((v) => v.slug === params.slug);
+export default async function BookingPage({ params }: Props) {
+  const { slug } = await params;
+  const venue = allVenues.find((v) => v.slug === slug);
   if (!venue) notFound();
 
   return (

@@ -1,0 +1,143 @@
+.main {
+  padding: 40px 0 64px;
+  min-height: calc(100vh - 56px - 64px);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.breadLink {
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.breadLink:hover {
+  color: var(--accent);
+}
+
+.sep {
+  color: var(--border);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: sticky;
+  top: 80px;
+}
+
+.venueInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.type {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.venueName {
+  font-size: clamp(20px, 3.5vw, 32px);
+  font-weight: 700;
+}
+
+.venueLocation {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star {
+  color: var(--star);
+}
+
+.score {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.count {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.infoBox {
+  background: var(--gray-bg);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.infoTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.infoList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoList li {
+  font-size: 13px;
+  color: var(--muted);
+  padding-left: 16px;
+  position: relative;
+}
+
+.infoList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.right {
+  width: 100%;
+}
+
+.footer {
+  background: var(--gray-bg);
+  padding: 28px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}

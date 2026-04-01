@@ -90,8 +90,8 @@ export default function BusinessRegisterPage() {
               gönderdik. Birkaç dakika içinde kontrol edin.
             </p>
             <div className={styles.successActions}>
-              <Link href="/for-business" className={styles.btnPrimary}>
-                İşletmeler İçin Sayfasına Dön
+              <Link href="/panel" className={styles.btnPrimary}>
+                Panele Git →
               </Link>
               <Link href="/" className={styles.btnOutline}>
                 Ana Sayfaya Git

@@ -416,6 +416,7 @@
 .status_onaylı     { background: #d1fae5; color: #065f46; }
 .status_tamamlandı { background: #dbeafe; color: #1e40af; }
 .status_iptal      { background: #fee2e2; color: #991b1b; }
+.status_noshow     { background: #fed7aa; color: #9a3412; }
 
 /* ── QUICK ACTIONS ── */
 .quickActions {
@@ -1613,5 +1614,358 @@
   .perfRow {
     grid-template-columns: 2fr 1fr 1.2fr 1.5fr;
   }
+}
+
+/* ─────────────────────────────────────────────────────
+   APPOINTMENT ACTION BUTTONS
+───────────────────────────────────────────────────── */
+.btnApprove {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: #d1fae5;
+  color: #065f46;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btnApprove:hover { opacity: 0.8; }
+
+.btnNoshow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: #fed7aa;
+  color: #9a3412;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btnNoshow:hover { opacity: 0.8; }
+
+/* ─────────────────────────────────────────────────────
+   CALENDAR NAVIGATION
+───────────────────────────────────────────────────── */
+.calNavRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.calNavBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black);
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.calNavBtn:hover { border-color: var(--accent); background: #f3f0ff; }
+
+.calNavTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  flex: 1;
+}
+
+/* ─────────────────────────────────────────────────────
+   DAY VIEW TIMELINE
+───────────────────────────────────────────────────── */
+.dayView { overflow-x: auto; }
+
+.dayStaffHeader {
+  flex: 1;
+  min-width: 160px;
+  padding: 10px 12px;
+  background: var(--gray-bg);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+  text-align: center;
+}
+
+.dayTimeLabel {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: right;
+  padding-right: 8px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.daySlot {
+  height: 30px;
+  border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  transition: background 0.1s;
+}
+.daySlot:hover { background: #f3f0ff; }
+
+.apptBlock {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  padding: 3px 6px;
+  overflow: hidden;
+  cursor: grab;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+}
+.apptBlock:active { cursor: grabbing; }
+
+.apptBlockPending { background: #f59e0b !important; }
+.apptBlockNoshow  { background: #9ca3af !important; }
+
+/* ─────────────────────────────────────────────────────
+   WEEK VIEW
+───────────────────────────────────────────────────── */
+.weekGrid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--white);
+  min-width: 600px;
+}
+
+.weekTimeHeader {
+  background: var(--gray-bg);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.weekDayHeader {
+  background: var(--gray-bg);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.weekTimeCell {
+  background: var(--gray-bg);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: right;
+}
+
+.weekCell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 6px;
+  min-height: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weekChip {
+  background: #ede9fe;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 2px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.weekChipPending { background: #fef3c7; color: #92400e; }
+
+/* ─────────────────────────────────────────────────────
+   MONTH VIEW
+───────────────────────────────────────────────────── */
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.monthDayName {
+  background: var(--gray-bg);
+  text-align: center;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.monthDayName:last-child { border-right: none; }
+
+.monthCell {
+  min-height: 80px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.monthCell:nth-child(7n) { border-right: none; }
+
+.monthCellClickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.monthCellClickable:hover { background: #f3f0ff; }
+
+.monthCellEmpty { background: var(--gray-bg); opacity: 0.5; }
+
+.monthCellActive { background: #ede9fe; }
+
+.monthCellDay {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.monthDot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.monthDotCircle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────
+   CUSTOMER CRM TABLE
+───────────────────────────────────────────────────── */
+.crmTableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.crmTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.crmTable thead tr {
+  background: var(--gray-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.crmTable th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.crmRow {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.crmRow:last-child { border-bottom: none; }
+.crmRow:hover { background: var(--gray-bg); }
+
+.crmTable td {
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+
+.crmDetailCell {
+  padding: 0 !important;
+  background: var(--gray-bg);
+}
+
+.crmDetail {
+  padding: 20px 24px;
+}
+
+.crmDetailStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.crmStatCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.trustBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.trustBadgeGood { background: #d1fae5; color: #065f46; }
+.trustBadgeMid  { background: #fef3c7; color: #92400e; }
+.trustBadgeLow  { background: #fee2e2; color: #991b1b; }
+
+@media (max-width: 600px) {
+  .crmDetailStats { grid-template-columns: 1fr; }
+  .crmTable th:nth-child(n+3), .crmTable td:nth-child(n+3) { display: none; }
 }
 

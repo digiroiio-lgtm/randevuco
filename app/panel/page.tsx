@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import styles from './page.module.css';
@@ -33,10 +33,11 @@ type Appointment = {
   time: string;
   duration: string;
   price: string;
-  status: 'bekliyor' | 'onaylı' | 'tamamlandı' | 'iptal';
+  status: 'bekliyor' | 'onaylı' | 'tamamlandı' | 'iptal' | 'noshow';
+  phone?: string;
 };
 
-const APPOINTMENTS: Appointment[] = [
+const APPOINTMENTS_DATA: Appointment[] = [
   { id: 1, customer: 'Ahmet Yılmaz',   service: 'Saç Kesimi',         staff: 'Serdar Zorlu',  date: '2026-04-01', time: '09:00', duration: '45 dk', price: '₺350', status: 'onaylı' },
   { id: 2, customer: 'Merve Kaya',     service: 'Renklendirme',       staff: 'Serdar Zorlu',  date: '2026-04-01', time: '10:30', duration: '90 dk', price: '₺800', status: 'onaylı' },
   { id: 3, customer: 'Canan Şahin',    service: 'Keratin Bakımı',     staff: 'Selin Çelik',   date: '2026-04-01', time: '13:00', duration: '120 dk', price: '₺1200', status: 'bekliyor' },
@@ -169,6 +170,36 @@ const INITIAL_NEW_STAFF: NewStaffForm = {
   slotInterval: '30',
 };
 
+/* ── Customer types & data ── */
+type Customer = {
+  id: number;
+  name: string;
+  phone: string;
+  visitCount: number;
+  totalSpend: number;
+  trustScore: number;
+  lastVisit: string;
+  notes: string;
+};
+
+const INITIAL_CUSTOMERS: Customer[] = [
+  { id: 1, name: 'Ahmet Yılmaz',  phone: '0532 111 11 11', visitCount: 8,  totalSpend: 2800,  trustScore: 100, lastVisit: '2026-04-01', notes: '' },
+  { id: 2, name: 'Merve Kaya',    phone: '0533 222 22 22', visitCount: 12, totalSpend: 9600,  trustScore: 90,  lastVisit: '2026-04-01', notes: '' },
+  { id: 3, name: 'Canan Şahin',   phone: '0534 333 33 33', visitCount: 3,  totalSpend: 3600,  trustScore: 80,  lastVisit: '2026-04-01', notes: '' },
+  { id: 4, name: 'Tolga Demir',   phone: '0535 444 44 44', visitCount: 5,  totalSpend: 1750,  trustScore: 70,  lastVisit: '2026-04-01', notes: '' },
+  { id: 5, name: 'Elif Arslan',   phone: '0536 555 55 55', visitCount: 7,  totalSpend: 10500, trustScore: 100, lastVisit: '2026-04-02', notes: '' },
+  { id: 6, name: 'Kemal Öztürk', phone: '0537 666 66 66', visitCount: 2,  totalSpend: 900,   trustScore: 90,  lastVisit: '2026-04-02', notes: '' },
+];
+
+type BookingSettings = {
+  autoApproval: boolean;
+  cancellationHours: number;
+  whatsapp: boolean;
+  smsReminder: boolean;
+  emailReminder: boolean;
+  reminderTiming: '24h' | '2h' | 'both';
+};
+
 const WORKING_HOURS = [
   { day: 'Pazartesi', open: '09:00', close: '20:00', closed: false },
   { day: 'Salı',      open: '09:00', close: '20:00', closed: false },
@@ -187,17 +218,63 @@ const STATUS_LABEL: Record<Appointment['status'], string> = {
   onaylı:     'Onaylı',
   tamamlandı: 'Tamamlandı',
   iptal:      'İptal',
+  noshow:     'No-show',
 };
 
 function fmtDate(iso: string) {
-  const d = new Date(iso);
+  const d = new Date(iso + 'T12:00:00');
   return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'short' });
 }
+
+/* ── Calendar helpers ── */
+function timeToMin(t: string): number {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function minToTime(mins: number): string {
+  return `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+}
+function parseDuration(d: string): number {
+  return parseInt(d) || 30;
+}
+
+function getWeekDays(isoDate: string): string[] {
+  const d = new Date(isoDate + 'T12:00:00');
+  const dow = d.getDay();
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + mondayOffset);
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    return day.toISOString().slice(0, 10);
+  });
+}
+
+function getMonthCells(isoDate: string): (string | null)[] {
+  const d = new Date(isoDate + 'T12:00:00');
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDow = firstDay.getDay();
+  const mondayStart = startDow === 0 ? 6 : startDow - 1;
+  const cells: (string | null)[] = Array(mondayStart).fill(null);
+  for (let day2 = 1; day2 <= lastDay.getDate(); day2++) {
+    cells.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(day2).padStart(2, '0')}`);
+  }
+  while (cells.length % 7 !== 0) cells.push(null);
+  return cells;
+}
+
+const DAY_SLOTS: string[] = Array.from({ length: 24 }, (_, i) => minToTime(8 * 60 + i * 30));
+const WEEK_HOURS: string[] = Array.from({ length: 12 }, (_, i) => `${String(8 + i).padStart(2, '0')}:00`);
+const TR_DAYS_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
 /* ─────────────────────────────────────────────────────────────
    COMPONENT
 ───────────────────────────────────────────────────────────── */
-type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'profil' | 'ayarlar';
+type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'musteriler' | 'profil' | 'ayarlar';
 
 export default function PanelPage() {
   const [activeTab, setActiveTab] = useState<Tab>('genel');
@@ -230,14 +307,43 @@ export default function PanelPage() {
   const [newStaff, setNewStaff] = useState<NewStaffForm>({ ...INITIAL_NEW_STAFF });
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
 
+  // Appointments state
+  const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS_DATA);
+
+  // Calendar / booking views
+  const [randevuView, setRandevuView] = useState<'liste' | 'gun' | 'hafta' | 'ay'>('liste');
+  const [calDate, setCalDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [calStaff, setCalStaff] = useState<string>('');
+  const [dragApptId, setDragApptId] = useState<number | null>(null);
+
+  // Customers CRM
+  const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+
+  // Booking settings
+  const [bookingSettings, setBookingSettings] = useState<BookingSettings>({
+    autoApproval: false,
+    cancellationHours: 24,
+    whatsapp: true,
+    smsReminder: true,
+    emailReminder: true,
+    reminderTiming: 'both',
+  });
+  const [bookingSettingsSaved, setBookingSettingsSaved] = useState(false);
+
   /* ── derived ── */
   const today = new Date().toISOString().slice(0, 10);
-  const todayAppts = APPOINTMENTS.filter((a) => a.date === today && a.status !== 'iptal');
-  const pendingCount = APPOINTMENTS.filter((a) => a.status === 'bekliyor').length;
-  const monthRevenue = APPOINTMENTS.filter((a) => a.status === 'tamamlandı')
+  const todayAppts = appointments.filter((a) => a.date === today && a.status !== 'iptal');
+  const pendingCount = appointments.filter((a) => a.status === 'bekliyor').length;
+  const monthRevenue = appointments.filter((a) => a.status === 'tamamlandı')
     .reduce((sum, a) => sum + parseInt(a.price.replace(/[^\d]/g, '')), 0);
   const filteredAppts =
-    apptFilter === 'tümü' ? APPOINTMENTS : APPOINTMENTS.filter((a) => a.status === apptFilter);
+    apptFilter === 'tümü' ? appointments : appointments.filter((a) => a.status === apptFilter);
+
+  // Calendar-derived
+  const weekDays = getWeekDays(calDate);
+  const monthCells = getMonthCells(calDate);
+  const dayViewStaff = staff.filter((sm) => sm.active && (!calStaff || sm.name === calStaff));
 
   /* ── handlers ── */
   function toggleService(id: number) {
@@ -302,12 +408,41 @@ export default function PanelPage() {
     setStaff((prev) => prev.map((s) => s.id === id ? { ...s, active: !s.active } : s));
   }
 
+  /* ── Appointment handlers ── */
+  function approveAppt(id: number) {
+    setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'onaylı' as const } : a));
+  }
+  function noshowAppt(id: number) {
+    setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'noshow' as const } : a));
+    // Decrease trust score for the customer
+    const appt = appointments.find((a) => a.id === id);
+    if (appt) {
+      setCustomers((prev) => prev.map((c) =>
+        c.name === appt.customer ? { ...c, trustScore: Math.max(0, c.trustScore - 10) } : c,
+      ));
+    }
+  }
+  function handleDayDrop(staffName: string, slot: string) {
+    if (dragApptId === null) return;
+    setAppointments((prev) => prev.map((a) =>
+      a.id === dragApptId ? { ...a, staff: staffName, time: slot, date: calDate } : a,
+    ));
+    setDragApptId(null);
+  }
+
+  /* ── Booking settings handler ── */
+  function saveBookingSettings() {
+    setBookingSettingsSaved(true);
+    setTimeout(() => setBookingSettingsSaved(false), 2500);
+  }
+
   /* ── nav items ── */
   const NAV: { id: Tab; label: string; icon: string }[] = [
     { id: 'genel',      label: 'Genel Bakış',  icon: '📊' },
     { id: 'randevular', label: 'Randevular',   icon: '📅' },
     { id: 'hizmetler',  label: 'Hizmetler',    icon: '✂️' },
     { id: 'personel',   label: 'Personel',     icon: '👥' },
+    { id: 'musteriler', label: 'Müşteriler',   icon: '👤' },
     { id: 'profil',     label: 'Profil',       icon: '🏪' },
     { id: 'ayarlar',    label: 'Ayarlar',      icon: '⚙️' },
   ];
@@ -468,7 +603,7 @@ export default function PanelPage() {
                           <p className={styles.apptService}>{a.service} · {a.duration}</p>
                         </div>
                         <div className={styles.apptRight}>
-                          <span className={`${styles.statusBadge} ${styles[`status_${a.status}`]}`}>
+                          <span className={`${styles.statusBadge} ${(styles as Record<string,string>)[`status_${a.status}`]}`}>
                             {STATUS_LABEL[a.status]}
                           </span>
                           <span className={styles.apptPrice}>{a.price}</span>
@@ -520,54 +655,310 @@ export default function PanelPage() {
           {activeTab === 'randevular' && (
             <div className={styles.section}>
 
-              {/* filter pills */}
-              <div className={styles.filterBar}>
-                {(['tümü', 'bekliyor', 'onaylı', 'tamamlandı', 'iptal'] as const).map((f) => (
+              {/* View switcher */}
+              <div className={styles.subTabBar} style={{ marginBottom: 20 }}>
+                {(['liste', 'gun', 'hafta', 'ay'] as const).map((v) => (
                   <button
-                    key={f}
-                    className={`${styles.filterPill} ${apptFilter === f ? styles.filterPillActive : ''}`}
-                    onClick={() => setApptFilter(f)}
+                    key={v}
+                    className={`${styles.subTab} ${randevuView === v ? styles.subTabActive : ''}`}
+                    onClick={() => setRandevuView(v)}
                   >
-                    {f === 'tümü' ? 'Tümü' : STATUS_LABEL[f as Appointment['status']]}
-                    {f !== 'tümü' && (
-                      <span className={styles.filterCount}>
-                        {APPOINTMENTS.filter((a) => a.status === f).length}
-                      </span>
-                    )}
+                    {v === 'liste' ? 'Liste' : v === 'gun' ? 'Gün' : v === 'hafta' ? 'Hafta' : 'Ay'}
                   </button>
                 ))}
               </div>
 
-              {/* list */}
-              <div className={styles.apptListFull}>
-                {filteredAppts.length === 0 ? (
-                  <p className={styles.empty}>Bu filtreye uygun randevu yok.</p>
-                ) : (
-                  filteredAppts.map((a) => (
-                    <div key={a.id} className={styles.apptCard}>
-                      <div className={styles.apptCardLeft}>
-                        <div className={styles.apptCardDate}>
-                          <span className={styles.apptCardDay}>
-                            {new Date(a.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
-                          </span>
-                          <span className={styles.apptCardHour}>{a.time}</span>
-                        </div>
-                        <div className={styles.apptCardAvatar}>{a.customer.charAt(0)}</div>
-                        <div>
-                          <p className={styles.apptCardName}>{a.customer}</p>
-                          <p className={styles.apptCardSub}>{a.service} · {a.duration} · {a.staff}</p>
-                        </div>
-                      </div>
-                      <div className={styles.apptCardRight}>
-                        <span className={`${styles.statusBadge} ${styles[`status_${a.status}`]}`}>
-                          {STATUS_LABEL[a.status]}
-                        </span>
-                        <span className={styles.apptCardPrice}>{a.price}</span>
-                      </div>
+              {/* ── LISTE VIEW ── */}
+              {randevuView === 'liste' && (
+                <>
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div className={styles.filterBar} style={{ margin: 0 }}>
+                      {(['tümü', 'bekliyor', 'onaylı', 'tamamlandı', 'iptal', 'noshow'] as const).map((f) => (
+                        <button
+                          key={f}
+                          className={`${styles.filterPill} ${apptFilter === f ? styles.filterPillActive : ''}`}
+                          onClick={() => setApptFilter(f)}
+                        >
+                          {f === 'tümü' ? 'Tümü' : STATUS_LABEL[f as Appointment['status']]}
+                          {f !== 'tümü' && (
+                            <span className={styles.filterCount}>
+                              {appointments.filter((a) => a.status === f).length}
+                            </span>
+                          )}
+                        </button>
+                      ))}
                     </div>
-                  ))
-                )}
-              </div>
+                    <select
+                      className={styles.select}
+                      style={{ width: 'auto', minWidth: 150 }}
+                      value={calStaff}
+                      onChange={(e) => setCalStaff(e.target.value)}
+                    >
+                      <option value="">Tüm Personel</option>
+                      {staff.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div className={styles.apptListFull}>
+                    {filteredAppts.filter((a) => !calStaff || a.staff === calStaff).length === 0 ? (
+                      <p className={styles.empty}>Bu filtreye uygun randevu yok.</p>
+                    ) : (
+                      filteredAppts.filter((a) => !calStaff || a.staff === calStaff).map((a) => (
+                        <div key={a.id} className={styles.apptCard}>
+                          <div className={styles.apptCardLeft}>
+                            <div className={styles.apptCardDate}>
+                              <span className={styles.apptCardDay}>
+                                {new Date(a.date + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                              </span>
+                              <span className={styles.apptCardHour}>{a.time}</span>
+                            </div>
+                            <div className={styles.apptCardAvatar}>{a.customer.charAt(0)}</div>
+                            <div>
+                              <p className={styles.apptCardName}>{a.customer}</p>
+                              <p className={styles.apptCardSub}>{a.service} · {a.duration} · {a.staff}</p>
+                            </div>
+                          </div>
+                          <div className={styles.apptCardRight}>
+                            <span className={`${styles.statusBadge} ${(styles as Record<string,string>)[`status_${a.status}`]}`}>
+                              {STATUS_LABEL[a.status]}
+                            </span>
+                            {a.status === 'bekliyor' && (
+                              <button className={styles.btnApprove} onClick={() => approveAppt(a.id)}>Onayla</button>
+                            )}
+                            {a.status === 'onaylı' && (
+                              <button className={styles.btnNoshow} onClick={() => noshowAppt(a.id)}>No-show</button>
+                            )}
+                            <span className={styles.apptCardPrice}>{a.price}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* ── GÜN VIEW ── */}
+              {randevuView === 'gun' && (
+                <div className={styles.dayView}>
+                  <div className={styles.calNavRow}>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setDate(d.getDate() - 1);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>‹</button>
+                    <span className={styles.calNavTitle}>{fmtDate(calDate)}</span>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setDate(d.getDate() + 1);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>›</button>
+                    <select
+                      className={styles.select}
+                      style={{ width: 'auto', minWidth: 150, marginLeft: 16 }}
+                      value={calStaff}
+                      onChange={(e) => setCalStaff(e.target.value)}
+                    >
+                      <option value="">Tüm Personel</option>
+                      {staff.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div style={{ overflowX: 'auto' }}>
+                    {/* Column headers */}
+                    <div style={{ display: 'flex', minWidth: 60 + dayViewStaff.length * 160 }}>
+                      <div style={{ width: 60, flexShrink: 0 }} />
+                      {dayViewStaff.map((sm) => (
+                        <div key={sm.id} className={styles.dayStaffHeader}>{sm.name}</div>
+                      ))}
+                    </div>
+                    {/* Body */}
+                    <div style={{ display: 'flex', minWidth: 60 + dayViewStaff.length * 160 }}>
+                      {/* Time labels */}
+                      <div style={{ width: 60, flexShrink: 0 }}>
+                        {DAY_SLOTS.map((slot, i) => (
+                          <div key={slot} className={styles.dayTimeLabel} style={{ height: 30 }}>
+                            {i % 2 === 0 ? slot : ''}
+                          </div>
+                        ))}
+                      </div>
+                      {/* Staff columns */}
+                      {dayViewStaff.length === 0 ? (
+                        <p className={styles.empty} style={{ padding: 20 }}>Gösterilecek personel yok.</p>
+                      ) : dayViewStaff.map((sm) => {
+                        const smAppts = appointments.filter(
+                          (a) => a.date === calDate && a.staff === sm.name && a.status !== 'iptal',
+                        );
+                        return (
+                          <div
+                            key={sm.id}
+                            style={{
+                              flex: 1, minWidth: 160,
+                              position: 'relative',
+                              height: DAY_SLOTS.length * 30,
+                              borderLeft: '1px solid var(--border)',
+                            }}
+                          >
+                            {/* Drop-zone slots */}
+                            {DAY_SLOTS.map((slot, i) => (
+                              <div
+                                key={slot}
+                                className={styles.daySlot}
+                                style={{ position: 'absolute', top: i * 30, left: 0, right: 0 }}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={() => handleDayDrop(sm.name, slot)}
+                              />
+                            ))}
+                            {/* Appointment blocks */}
+                            {smAppts.map((a) => {
+                              const topPx = timeToMin(a.time) - timeToMin('08:00');
+                              const heightPx = Math.max(parseDuration(a.duration), 28);
+                              return (
+                                <div
+                                  key={a.id}
+                                  className={[
+                                    styles.apptBlock,
+                                    a.status === 'bekliyor' ? styles.apptBlockPending : '',
+                                    a.status === 'noshow' ? styles.apptBlockNoshow : '',
+                                  ].join(' ')}
+                                  style={{ position: 'absolute', top: topPx, height: heightPx, left: 4, right: 4 }}
+                                  draggable
+                                  onDragStart={() => setDragApptId(a.id)}
+                                >
+                                  <div style={{ fontWeight: 700, fontSize: 10, lineHeight: 1.3 }}>{a.customer}</div>
+                                  <div style={{ fontSize: 10, opacity: 0.9 }}>{a.service}</div>
+                                  <div style={{ fontSize: 10, opacity: 0.8 }}>{a.time}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── HAFTA VIEW ── */}
+              {randevuView === 'hafta' && (
+                <div>
+                  <div className={styles.calNavRow}>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setDate(d.getDate() - 7);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>‹</button>
+                    <span className={styles.calNavTitle}>
+                      {weekDays[0] && new Date(weekDays[0] + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}
+                      {' – '}
+                      {weekDays[6] && new Date(weekDays[6] + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setDate(d.getDate() + 7);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>›</button>
+                    <select
+                      className={styles.select}
+                      style={{ width: 'auto', minWidth: 150, marginLeft: 16 }}
+                      value={calStaff}
+                      onChange={(e) => setCalStaff(e.target.value)}
+                    >
+                      <option value="">Tüm Personel</option>
+                      {staff.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div style={{ overflowX: 'auto' }}>
+                    <div className={styles.weekGrid}>
+                      {/* Header */}
+                      <div className={styles.weekTimeHeader} />
+                      {weekDays.map((d) => {
+                        const dow = new Date(d + 'T12:00:00').getDay();
+                        return (
+                          <div key={d} className={styles.weekDayHeader}>
+                            <span>{TR_DAYS_SHORT[dow === 0 ? 6 : dow - 1]}</span>
+                            <span style={{ fontSize: 12 }}>{new Date(d + 'T12:00:00').getDate()}</span>
+                          </div>
+                        );
+                      })}
+                      {/* Hour rows */}
+                      {WEEK_HOURS.map((hour) => (
+                        <Fragment key={hour}>
+                          <div className={styles.weekTimeCell}>{hour}</div>
+                          {weekDays.map((d) => {
+                            const cellAppts = appointments.filter((a) =>
+                              a.date === d &&
+                              a.time >= hour && a.time < (WEEK_HOURS[WEEK_HOURS.indexOf(hour) + 1] ?? '20:00') &&
+                              (!calStaff || a.staff === calStaff) &&
+                              a.status !== 'iptal',
+                            );
+                            return (
+                              <div key={`${d}-${hour}`} className={styles.weekCell}>
+                                {cellAppts.map((a) => (
+                                  <div
+                                    key={a.id}
+                                    className={`${styles.weekChip} ${a.status === 'bekliyor' ? styles.weekChipPending : ''}`}
+                                  >
+                                    {a.customer.split(' ')[0]}
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </Fragment>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── AY VIEW ── */}
+              {randevuView === 'ay' && (
+                <div>
+                  <div className={styles.calNavRow}>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setMonth(d.getMonth() - 1);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>‹</button>
+                    <span className={styles.calNavTitle}>
+                      {new Date(calDate + 'T12:00:00').toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <button className={styles.calNavBtn} onClick={() => {
+                      const d = new Date(calDate + 'T12:00:00'); d.setMonth(d.getMonth() + 1);
+                      setCalDate(d.toISOString().slice(0, 10));
+                    }}>›</button>
+                  </div>
+
+                  <div className={styles.monthGrid}>
+                    {TR_DAYS_SHORT.map((d) => (
+                      <div key={d} className={styles.monthDayName}>{d}</div>
+                    ))}
+                    {monthCells.map((cell, i) => {
+                      const count = cell ? appointments.filter((a) => a.date === cell && a.status !== 'iptal').length : 0;
+                      return (
+                        <div
+                          key={i}
+                          className={[
+                            styles.monthCell,
+                            cell === calDate ? styles.monthCellActive : '',
+                            cell ? styles.monthCellClickable : styles.monthCellEmpty,
+                          ].join(' ')}
+                          onClick={() => { if (cell) { setCalDate(cell); setRandevuView('gun'); } }}
+                        >
+                          {cell && (
+                            <>
+                              <span className={styles.monthCellDay}>{new Date(cell + 'T12:00:00').getDate()}</span>
+                              {count > 0 && (
+                                <span className={styles.monthDot}>
+                                  <span className={styles.monthDotCircle} />
+                                  <span>{count}</span>
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
@@ -907,8 +1298,9 @@ export default function PanelPage() {
                     </>
                   ) : (
                     (() => {
-                      const sm = staff.find((s) => s.id === selectedStaffId)!;
-                      const todaySchedule = APPOINTMENTS.filter(
+                      const sm = staff.find((s) => s.id === selectedStaffId);
+                      if (!sm) return null;
+                      const todaySchedule = appointments.filter(
                         (a) => a.date === today && a.staff === sm.name && a.status !== 'iptal',
                       );
                       return (
@@ -1024,7 +1416,7 @@ export default function PanelPage() {
                       {/* slot rows */}
                       {CALENDAR_SLOTS.map((slot) => {
                         const cells: (string | null)[] = staff.map((sm) => {
-                          const appt = APPOINTMENTS.find(
+                          const appt = appointments.find(
                             (a) => a.date === today && a.time === slot.hour && a.staff === sm.name && a.status !== 'iptal',
                           );
                           return appt ? appt.customer : null;
@@ -1048,6 +1440,117 @@ export default function PanelPage() {
                 </>
               )}
 
+            </div>
+          )}
+
+          {/* ════════════════ MÜŞTERİLER ════════════════ */}
+          {activeTab === 'musteriler' && (
+            <div className={styles.section}>
+              <p className={styles.sectionSub}>{customers.length} müşteri</p>
+
+              <div className={styles.crmTableWrap}>
+                <table className={styles.crmTable}>
+                  <thead>
+                    <tr>
+                      <th>Müşteri</th>
+                      <th>Ziyaret</th>
+                      <th>Harcama</th>
+                      <th>Güven</th>
+                      <th>Son Ziyaret</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {customers.map((c) => (
+                      <Fragment key={c.id}>
+                        <tr
+                          className={styles.crmRow}
+                          onClick={() => setSelectedCustomerId(selectedCustomerId === c.id ? null : c.id)}
+                        >
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <div className={styles.apptCardAvatar}>{c.name.charAt(0)}</div>
+                              <div>
+                                <p style={{ fontWeight: 600, fontSize: 14 }}>{c.name}</p>
+                                <p style={{ fontSize: 12, color: 'var(--muted)' }}>{c.phone}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ fontSize: 14, fontWeight: 600 }}>{c.visitCount}</td>
+                          <td style={{ fontSize: 14, fontWeight: 600 }}>₺{c.totalSpend.toLocaleString('tr-TR')}</td>
+                          <td>
+                            <span className={[
+                              styles.trustBadge,
+                              c.trustScore >= 90 ? styles.trustBadgeGood : c.trustScore >= 70 ? styles.trustBadgeMid : styles.trustBadgeLow,
+                            ].join(' ')}>
+                              {c.trustScore >= 90 ? 'Güvenilir' : c.trustScore >= 70 ? 'Orta' : 'Riskli'}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: 13, color: 'var(--muted)' }}>
+                            {new Date(c.lastVisit + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+                        </tr>
+                        {selectedCustomerId === c.id && (
+                          <tr>
+                            <td colSpan={5} className={styles.crmDetailCell}>
+                              <div className={styles.crmDetail}>
+                                {/* Mini stat cards */}
+                                <div className={styles.crmDetailStats}>
+                                  <div className={styles.crmStatCard}>
+                                    <p className={styles.statValue}>{c.visitCount}</p>
+                                    <p className={styles.statLabel}>Toplam Ziyaret</p>
+                                  </div>
+                                  <div className={styles.crmStatCard}>
+                                    <p className={styles.statValue}>₺{c.totalSpend.toLocaleString('tr-TR')}</p>
+                                    <p className={styles.statLabel}>Toplam Harcama</p>
+                                  </div>
+                                  <div className={styles.crmStatCard}>
+                                    <p className={styles.statValue}>{c.trustScore}</p>
+                                    <p className={styles.statLabel}>Güven Puanı</p>
+                                  </div>
+                                </div>
+
+                                {/* Last 3 appointments */}
+                                <h4 style={{ fontWeight: 700, marginBottom: 8, marginTop: 16, fontSize: 14 }}>Son Randevular</h4>
+                                {appointments.filter((a) => a.customer === c.name).slice(-3).reverse().map((a) => (
+                                  <div key={a.id} className={styles.apptRow}>
+                                    <div className={styles.apptTime}>{a.time}</div>
+                                    <div className={styles.apptMeta}>
+                                      <p className={styles.apptCustomer}>{a.service}</p>
+                                      <p className={styles.apptService}>{fmtDate(a.date)}</p>
+                                    </div>
+                                    <span className={`${styles.statusBadge} ${(styles as Record<string,string>)[`status_${a.status}`]}`}>
+                                      {STATUS_LABEL[a.status]}
+                                    </span>
+                                  </div>
+                                ))}
+                                {appointments.filter((a) => a.customer === c.name).length === 0 && (
+                                  <p className={styles.empty}>Randevu geçmişi yok.</p>
+                                )}
+
+                                {/* Notes */}
+                                <h4 style={{ fontWeight: 700, marginBottom: 8, marginTop: 16, fontSize: 14 }}>Notlar</h4>
+                                <textarea
+                                  className={styles.textarea}
+                                  rows={3}
+                                  value={c.notes}
+                                  onChange={(e) => setCustomers((prev) =>
+                                    prev.map((cu) => cu.id === c.id ? { ...cu, notes: e.target.value } : cu),
+                                  )}
+                                />
+                                <div style={{ marginTop: 8, textAlign: 'right' }}>
+                                  <button className={styles.btnPrimary} style={{ fontSize: 13 }}>
+                                    Not Kaydet
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -1261,6 +1764,100 @@ export default function PanelPage() {
                   <button type="submit" className={styles.btnPrimary}>Bildirimleri Kaydet</button>
                 </div>
               </form>
+
+              {/* Randevu Yönetimi */}
+              <div className={styles.formSection} style={{ marginTop: 24 }}>
+                <h3 className={styles.formSectionTitle}>Randevu Yönetimi</h3>
+                <div className={styles.notifList}>
+                  <label className={styles.notifRow}>
+                    <div>
+                      <p className={styles.notifLabel}>Otomatik Onay</p>
+                      <p className={styles.notifDesc}>Yeni randevular otomatik olarak onaylanır</p>
+                    </div>
+                    <div
+                      className={`${styles.toggleBtn} ${bookingSettings.autoApproval ? styles.toggleOn : ''}`}
+                      onClick={() => setBookingSettings((p) => ({ ...p, autoApproval: !p.autoApproval }))}
+                      role="switch"
+                      aria-checked={bookingSettings.autoApproval}
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === ' ' && setBookingSettings((p) => ({ ...p, autoApproval: !p.autoApproval }))}
+                    >
+                      <span className={styles.toggleKnob} />
+                    </div>
+                  </label>
+                  <div className={styles.notifRow}>
+                    <div>
+                      <p className={styles.notifLabel}>İptal Politikası</p>
+                      <p className={styles.notifDesc}>İptal için son saat (saat olarak)</p>
+                    </div>
+                    <input
+                      type="number"
+                      className={styles.input}
+                      style={{ width: 80 }}
+                      min={1}
+                      value={bookingSettings.cancellationHours}
+                      onChange={(e) => setBookingSettings((p) => ({ ...p, cancellationHours: parseInt(e.target.value) || 1 }))}
+                    />
+                  </div>
+                </div>
+                <div className={styles.formActions}>
+                  {bookingSettingsSaved && <span className={styles.savedMsg}>✓ Kaydedildi</span>}
+                  <button className={styles.btnPrimary} onClick={saveBookingSettings}>Kaydet</button>
+                </div>
+              </div>
+
+              {/* Otomatik Hatırlatma */}
+              <div className={styles.formSection} style={{ marginTop: 16 }}>
+                <h3 className={styles.formSectionTitle}>Otomatik Hatırlatma</h3>
+                <div className={styles.notifList}>
+                  {([
+                    { key: 'whatsapp'    as const, label: 'WhatsApp Hatırlatma', desc: 'Randevu öncesi WhatsApp mesajı gönder' },
+                    { key: 'smsReminder' as const, label: 'SMS Hatırlatma',      desc: 'Randevu öncesi SMS gönder' },
+                    { key: 'emailReminder' as const, label: 'E-posta Hatırlatma', desc: 'Randevu öncesi e-posta gönder' },
+                  ]).map((n) => (
+                    <label key={n.key} className={styles.notifRow}>
+                      <div>
+                        <p className={styles.notifLabel}>{n.label}</p>
+                        <p className={styles.notifDesc}>{n.desc}</p>
+                      </div>
+                      <div
+                        className={`${styles.toggleBtn} ${bookingSettings[n.key] ? styles.toggleOn : ''}`}
+                        onClick={() => setBookingSettings((p) => ({ ...p, [n.key]: !p[n.key] }))}
+                        role="switch"
+                        aria-checked={bookingSettings[n.key]}
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === ' ' && setBookingSettings((p) => ({ ...p, [n.key]: !p[n.key] }))}
+                      >
+                        <span className={styles.toggleKnob} />
+                      </div>
+                    </label>
+                  ))}
+                  <div className={styles.notifRow}>
+                    <div>
+                      <p className={styles.notifLabel}>Hatırlatma Zamanı</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 16 }}>
+                      {(['24h', '2h', 'both'] as const).map((v) => (
+                        <label key={v} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+                          <input
+                            type="radio"
+                            name="reminderTiming"
+                            value={v}
+                            checked={bookingSettings.reminderTiming === v}
+                            onChange={() => setBookingSettings((p) => ({ ...p, reminderTiming: v }))}
+                            style={{ accentColor: 'var(--accent)' }}
+                          />
+                          {v === '24h' ? '24 saat önce' : v === '2h' ? '2 saat önce' : 'Her ikisi'}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.formActions}>
+                  {bookingSettingsSaved && <span className={styles.savedMsg}>✓ Kaydedildi</span>}
+                  <button className={styles.btnPrimary} onClick={saveBookingSettings}>Kaydet</button>
+                </div>
+              </div>
 
               {/* Danger zone */}
               <div className={styles.dangerZone}>

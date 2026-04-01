@@ -289,7 +289,7 @@ type PosItem = {
 };
 type PosPayment = 'nakit' | 'kart' | 'online';
 
-type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'musteriler' | 'pos' | 'profil' | 'ayarlar';
+type Tab = 'genel' | 'analitik' | 'randevular' | 'hizmetler' | 'personel' | 'musteriler' | 'pos' | 'profil' | 'ayarlar';
 
 export default function PanelPage() {
   const [activeTab, setActiveTab] = useState<Tab>('genel');
@@ -521,6 +521,7 @@ export default function PanelPage() {
   /* ── nav items ── */
   const NAV: { id: Tab; label: string; icon: string }[] = [
     { id: 'genel',      label: 'Genel Bakış',  icon: '📊' },
+    { id: 'analitik',   label: 'Analitik',     icon: '📈' },
     { id: 'randevular', label: 'Randevular',   icon: '📅' },
     { id: 'hizmetler',  label: 'Hizmetler',    icon: '✂️' },
     { id: 'personel',   label: 'Personel',     icon: '👥' },
@@ -733,6 +734,158 @@ export default function PanelPage() {
               </div>
             </div>
           )}
+
+          {/* ════════════════ ANALİTİK ════════════════ */}
+          {activeTab === 'analitik' && (() => {
+            /* Last 14 days revenue data */
+            const last14: { label: string; date: string; revenue: number; count: number }[] = Array.from({ length: 14 }, (_, i) => {
+              const d = new Date();
+              d.setDate(d.getDate() - (13 - i));
+              const dateStr = d.toISOString().slice(0, 10);
+              const dayAppts = appointments.filter((a) => a.date === dateStr && a.status === 'tamamlandı');
+              return {
+                label: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
+                date: dateStr,
+                revenue: dayAppts.reduce((s, a) => s + parseInt(a.price.replace(/[^\d]/g, '')), 0),
+                count: dayAppts.length,
+              };
+            });
+            const maxRev = Math.max(...last14.map((d) => d.revenue), 1);
+
+            /* Service breakdown */
+            const svcMap: Record<string, { count: number; revenue: number }> = {};
+            appointments.filter((a) => a.status === 'tamamlandı').forEach((a) => {
+              const key = a.service;
+              if (!svcMap[key]) svcMap[key] = { count: 0, revenue: 0 };
+              svcMap[key].count++;
+              svcMap[key].revenue += parseInt(a.price.replace(/[^\d]/g, ''));
+            });
+            const topServices = Object.entries(svcMap)
+              .map(([name, v]) => ({ name, ...v }))
+              .sort((a, b) => b.revenue - a.revenue)
+              .slice(0, 6);
+            const maxSvcRev = Math.max(...topServices.map((s) => s.revenue), 1);
+
+            /* KPIs */
+            const totalCompleted = appointments.filter((a) => a.status === 'tamamlandı');
+            const totalRevenue   = totalCompleted.reduce((s, a) => s + parseInt(a.price.replace(/[^\d]/g, '')), 0);
+            const avgTransaction = totalCompleted.length > 0 ? Math.round(totalRevenue / totalCompleted.length) : 0;
+            const completionRate = appointments.length > 0
+              ? Math.round((totalCompleted.length / appointments.length) * 100)
+              : 0;
+            const noShowCount = appointments.filter((a) => a.status === 'gelmedi').length;
+
+            return (
+              <div className={styles.section}>
+                <p className={styles.sectionSub}>Son 14 gün · Tamamlanan randevular bazında</p>
+
+                {/* KPI cards */}
+                <div className={styles.statsGrid}>
+                  <div className={styles.statCard}>
+                    <span className={styles.statIcon}>💰</span>
+                    <div>
+                      <p className={styles.statValue}>₺{totalRevenue.toLocaleString('tr-TR')}</p>
+                      <p className={styles.statLabel}>Toplam Ciro</p>
+                    </div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statIcon}>🧾</span>
+                    <div>
+                      <p className={styles.statValue}>₺{avgTransaction.toLocaleString('tr-TR')}</p>
+                      <p className={styles.statLabel}>Ort. İşlem Tutarı</p>
+                    </div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statIcon}>✅</span>
+                    <div>
+                      <p className={styles.statValue}>%{completionRate}</p>
+                      <p className={styles.statLabel}>Tamamlanma Oranı</p>
+                    </div>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statIcon}>🚫</span>
+                    <div>
+                      <p className={styles.statValue}>{noShowCount}</p>
+                      <p className={styles.statLabel}>No-show Sayısı</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Revenue bar chart */}
+                <div className={styles.block}>
+                  <h2 className={styles.blockTitle}>Günlük Ciro (Son 14 Gün)</h2>
+                  <div className={styles.barChartWrap}>
+                    <div className={styles.barChart}>
+                      {last14.map((d) => (
+                        <div key={d.date} className={styles.barGroup}>
+                          <span className={styles.barValue}>
+                            {d.revenue > 0 ? `₺${d.revenue.toLocaleString('tr-TR')}` : ''}
+                          </span>
+                          <div
+                            className={styles.bar}
+                            style={{ height: `${Math.max((d.revenue / maxRev) * 120, d.revenue > 0 ? 4 : 0)}px` }}
+                            title={`₺${d.revenue.toLocaleString('tr-TR')} · ${d.count} randevu`}
+                          />
+                          <span className={styles.barLabel}>{d.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top services */}
+                <div className={styles.block}>
+                  <h2 className={styles.blockTitle}>En Çok Gelir Getiren Hizmetler</h2>
+                  {topServices.length === 0 ? (
+                    <p className={styles.empty}>Henüz tamamlanan randevu yok.</p>
+                  ) : (
+                    <div className={styles.hBarList}>
+                      {topServices.map((svc) => (
+                        <div key={svc.name} className={styles.hBarRow}>
+                          <span className={styles.hBarLabel}>{svc.name}</span>
+                          <div className={styles.hBarTrack}>
+                            <div
+                              className={styles.hBar}
+                              style={{ width: `${(svc.revenue / maxSvcRev) * 100}%` }}
+                            />
+                          </div>
+                          <span className={styles.hBarVal}>₺{svc.revenue.toLocaleString('tr-TR')}</span>
+                          <span className={styles.hBarCount}>{svc.count}x</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Staff performance */}
+                <div className={styles.block}>
+                  <h2 className={styles.blockTitle}>Personel Performansı</h2>
+                  <div className={styles.perfTable}>
+                    <div className={styles.perfTableHead}>
+                      <span>Personel</span>
+                      <span>Randevu</span>
+                      <span>Ciro</span>
+                      <span>Ort. İşlem</span>
+                      <span>Doluluk</span>
+                    </div>
+                    {staff.filter((sm) => sm.active).map((sm) => (
+                      <div key={sm.id} className={styles.perfTableRow}>
+                        <span className={styles.perfName}>{sm.name}</span>
+                        <span className={styles.perfVal}>{sm.perf.appointments}</span>
+                        <span className={styles.perfVal}>₺{sm.perf.revenue.toLocaleString('tr-TR')}</span>
+                        <span className={styles.perfVal}>₺{sm.perf.avgTransaction.toLocaleString('tr-TR')}</span>
+                        <span className={styles.perfVal}>
+                          <span className={styles.utilBar} style={{ '--u': `${sm.perf.utilization}%` } as React.CSSProperties}>
+                            %{sm.perf.utilization}
+                          </span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ════════════════ RANDEVULAR ════════════════ */}
           {activeTab === 'randevular' && (

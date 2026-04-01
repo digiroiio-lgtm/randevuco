@@ -2133,3 +2133,128 @@
   .posLayout { grid-template-columns: 1fr; }
   .posCart { position: static; }
 }
+
+/* ══════════════════════ ANALİTİK CHARTS ══════════════════════ */
+.barChartWrap {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.barChart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 160px;
+  min-width: 600px;
+  padding: 0 4px 4px;
+}
+
+.barGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 36px;
+}
+
+.bar {
+  width: 100%;
+  max-width: 36px;
+  background: var(--accent);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s;
+  min-height: 0;
+  opacity: 0.85;
+}
+
+.bar:hover { opacity: 1; }
+
+.barLabel {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.barValue {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  white-space: nowrap;
+  min-height: 12px;
+}
+
+/* Horizontal bars */
+.hBarList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hBarRow {
+  display: grid;
+  grid-template-columns: 180px 1fr 80px 36px;
+  align-items: center;
+  gap: 12px;
+}
+
+.hBarLabel {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hBarTrack {
+  height: 10px;
+  background: var(--gray-card);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.hBar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.4s;
+}
+
+.hBarVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+}
+
+.hBarCount {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* Utilization bar in analytics staff table */
+.utilBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.utilBar::before {
+  content: '';
+  display: inline-block;
+  width: 40px;
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(to right, var(--accent) var(--u, 0%), var(--gray-card) var(--u, 0%));
+}
+
+@media (max-width: 600px) {
+  .hBarRow { grid-template-columns: 1fr 80px; }
+  .hBarTrack { display: none; }
+  .hBarCount { display: none; }
+}

@@ -278,7 +278,18 @@ const TR_DAYS_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 /* ─────────────────────────────────────────────────────────────
    COMPONENT
 ───────────────────────────────────────────────────────────── */
-type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'musteriler' | 'profil' | 'ayarlar';
+/* ── POS types ── */
+type PosItem = {
+  serviceId: number;
+  name: string;
+  priceNum: number;
+  price: string;
+  duration: string;
+  qty: number;
+};
+type PosPayment = 'nakit' | 'kart' | 'online';
+
+type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'musteriler' | 'pos' | 'profil' | 'ayarlar';
 
 export default function PanelPage() {
   const [activeTab, setActiveTab] = useState<Tab>('genel');
@@ -334,6 +345,73 @@ export default function PanelPage() {
     reminderTiming: 'both',
   });
   const [bookingSettingsSaved, setBookingSettingsSaved] = useState(false);
+
+  /* ── POS state ── */
+  const [posCart, setPosCart]           = useState<PosItem[]>([]);
+  const [posCustomer, setPosCustomer]   = useState('');
+  const [posStaffId, setPosStaffId]     = useState<number | ''>('');
+  const [posDiscount, setPosDiscount]   = useState(0);
+  const [posPayment, setPosPayment]     = useState<PosPayment>('nakit');
+  const [posComplete, setPosComplete]   = useState(false);
+  const [posSvcSearch, setPosSvcSearch] = useState('');
+
+  function posAddItem(svc: Service) {
+    const priceNum = parseInt(svc.price.replace(/[^\d]/g, '')) || 0;
+    setPosCart((prev) => {
+      const existing = prev.find((i) => i.serviceId === svc.id);
+      if (existing) return prev.map((i) => i.serviceId === svc.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { serviceId: svc.id, name: svc.name, priceNum, price: svc.price, duration: svc.duration, qty: 1 }];
+    });
+  }
+
+  function posRemoveItem(serviceId: number) {
+    setPosCart((prev) => prev.filter((i) => i.serviceId !== serviceId));
+  }
+
+  function posChangeQty(serviceId: number, delta: number) {
+    setPosCart((prev) =>
+      prev
+        .map((i) => i.serviceId === serviceId ? { ...i, qty: i.qty + delta } : i)
+        .filter((i) => i.qty > 0)
+    );
+  }
+
+  const posSubtotal  = posCart.reduce((sum, i) => sum + i.priceNum * i.qty, 0);
+  const posDiscountAmt = Math.round(posSubtotal * posDiscount / 100);
+  const posTotal     = posSubtotal - posDiscountAmt;
+
+  function posCheckout() {
+    if (posCart.length === 0) return;
+    const staffName = posStaffId !== ''
+      ? staff.find((s) => s.id === Number(posStaffId))?.name ?? 'Bilinmiyor'
+      : 'Bilinmiyor';
+    const newAppt: Appointment = {
+      id:       Date.now(),
+      customer: posCustomer || 'Walk-in Müşteri',
+      service:  posCart.map((i) => i.name).join(', '),
+      staff:    staffName,
+      date:     today,
+      time:     new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+      duration: posCart.reduce((sum, i) => {
+        const m = parseInt(i.duration) || 30;
+        return sum + m * i.qty;
+      }, 0) + ' dk',
+      price:    `₺${posTotal.toLocaleString('tr-TR')}`,
+      status:   'tamamlandı',
+    };
+    setAppointments((prev) => [newAppt, ...prev]);
+    setPosComplete(true);
+  }
+
+  function posReset() {
+    setPosCart([]);
+    setPosCustomer('');
+    setPosStaffId('');
+    setPosDiscount(0);
+    setPosPayment('nakit');
+    setPosComplete(false);
+    setPosSvcSearch('');
+  }
 
   /* ── derived ── */
   const today = new Date().toISOString().slice(0, 10);
@@ -447,6 +525,7 @@ export default function PanelPage() {
     { id: 'hizmetler',  label: 'Hizmetler',    icon: '✂️' },
     { id: 'personel',   label: 'Personel',     icon: '👥' },
     { id: 'musteriler', label: 'Müşteriler',   icon: '👤' },
+    { id: 'pos',        label: 'POS / Kasa',   icon: '🧾' },
     { id: 'profil',     label: 'Profil',       icon: '🏪' },
     { id: 'ayarlar',    label: 'Ayarlar',      icon: '⚙️' },
   ];
@@ -1555,6 +1634,165 @@ export default function PanelPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* ════════════════ POS / KASA ════════════════ */}
+          {activeTab === 'pos' && (
+            <div className={styles.section}>
+              {posComplete ? (
+                <div className={styles.posSuccess}>
+                  <div className={styles.posSuccessIcon}>🧾</div>
+                  <h2 className={styles.blockTitle}>Satış Tamamlandı!</h2>
+                  <div className={styles.posReceiptBox}>
+                    <p><strong>Müşteri:</strong> {posCustomer || 'Walk-in Müşteri'}</p>
+                    <p><strong>Hizmetler:</strong> {posCart.map((i) => `${i.name}${i.qty > 1 ? ` x${i.qty}` : ''}`).join(', ')}</p>
+                    <p><strong>Ödeme:</strong> {posPayment === 'nakit' ? '💵 Nakit' : posPayment === 'kart' ? '💳 Kart' : '📱 Online'}</p>
+                    {posDiscount > 0 && <p><strong>İndirim:</strong> %{posDiscount} (−₺{posDiscountAmt.toLocaleString('tr-TR')})</p>}
+                    <p className={styles.posReceiptTotal}><strong>Toplam:</strong> ₺{posTotal.toLocaleString('tr-TR')}</p>
+                  </div>
+                  <button className={styles.btnPrimary} onClick={posReset}>Yeni Satış</button>
+                </div>
+              ) : (
+                <div className={styles.posLayout}>
+                  {/* ── Left: service catalog ── */}
+                  <div className={styles.posCatalog}>
+                    <h2 className={styles.blockTitle}>Hizmet Kataloğu</h2>
+                    <input
+                      className={styles.posSearch}
+                      placeholder="🔍 Hizmet ara..."
+                      value={posSvcSearch}
+                      onChange={(e) => setPosSvcSearch(e.target.value)}
+                    />
+                    {Array.from(new Set(services.filter((s) => s.active).map((s) => s.category))).map((cat) => {
+                      const items = services.filter((s) => s.active && s.category === cat &&
+                        (!posSvcSearch || s.name.toLowerCase().includes(posSvcSearch.toLowerCase())));
+                      if (items.length === 0) return null;
+                      return (
+                        <div key={cat} className={styles.posCatGroup}>
+                          <p className={styles.posCatLabel}>{cat}</p>
+                          {items.map((svc) => (
+                            <button key={svc.id} className={styles.posSvcBtn} onClick={() => posAddItem(svc)}>
+                              <span className={styles.posSvcName}>{svc.name}</span>
+                              <span className={styles.posSvcMeta}>{svc.duration} · {svc.price}</span>
+                              <span className={styles.posAddIcon}>+</span>
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* ── Right: cart ── */}
+                  <div className={styles.posCart}>
+                    <h2 className={styles.blockTitle}>Sepet</h2>
+
+                    {/* Customer */}
+                    <div className={styles.posField}>
+                      <label className={styles.posLabel}>Müşteri Adı</label>
+                      <input
+                        className={styles.posInput}
+                        placeholder="Walk-in veya müşteri adı"
+                        value={posCustomer}
+                        onChange={(e) => setPosCustomer(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Staff */}
+                    <div className={styles.posField}>
+                      <label className={styles.posLabel}>Personel</label>
+                      <select
+                        className={styles.posInput}
+                        value={posStaffId}
+                        onChange={(e) => setPosStaffId(e.target.value === '' ? '' : Number(e.target.value))}
+                      >
+                        <option value="">Seçiniz</option>
+                        {staff.filter((s) => s.active).map((s) => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Cart items */}
+                    {posCart.length === 0 ? (
+                      <p className={styles.posEmpty}>Sol taraftan hizmet ekleyin</p>
+                    ) : (
+                      <div className={styles.posItems}>
+                        {posCart.map((item) => (
+                          <div key={item.serviceId} className={styles.posItem}>
+                            <div className={styles.posItemInfo}>
+                              <span className={styles.posItemName}>{item.name}</span>
+                              <span className={styles.posItemPrice}>₺{(item.priceNum * item.qty).toLocaleString('tr-TR')}</span>
+                            </div>
+                            <div className={styles.posItemActions}>
+                              <button className={styles.posQtyBtn} onClick={() => posChangeQty(item.serviceId, -1)}>−</button>
+                              <span className={styles.posQty}>{item.qty}</span>
+                              <button className={styles.posQtyBtn} onClick={() => posChangeQty(item.serviceId, +1)}>+</button>
+                              <button className={styles.posRemoveBtn} onClick={() => posRemoveItem(item.serviceId)}>✕</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Discount */}
+                    <div className={styles.posField}>
+                      <label className={styles.posLabel}>İndirim (%)</label>
+                      <input
+                        className={styles.posInput}
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={posDiscount || ''}
+                        onChange={(e) => setPosDiscount(Math.min(100, Math.max(0, Number(e.target.value))))}
+                        placeholder="0"
+                      />
+                    </div>
+
+                    {/* Payment method */}
+                    <div className={styles.posField}>
+                      <label className={styles.posLabel}>Ödeme Yöntemi</label>
+                      <div className={styles.posPaymentRow}>
+                        {(['nakit', 'kart', 'online'] as PosPayment[]).map((m) => (
+                          <button
+                            key={m}
+                            className={`${styles.posPayBtn} ${posPayment === m ? styles.posPayBtnActive : ''}`}
+                            onClick={() => setPosPayment(m)}
+                          >
+                            {m === 'nakit' ? '💵 Nakit' : m === 'kart' ? '💳 Kart' : '📱 Online'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Total */}
+                    <div className={styles.posTotalBox}>
+                      <div className={styles.posTotalRow}>
+                        <span>Ara Toplam</span>
+                        <span>₺{posSubtotal.toLocaleString('tr-TR')}</span>
+                      </div>
+                      {posDiscount > 0 && (
+                        <div className={styles.posTotalRow}>
+                          <span>İndirim (%{posDiscount})</span>
+                          <span className={styles.posDiscountVal}>−₺{posDiscountAmt.toLocaleString('tr-TR')}</span>
+                        </div>
+                      )}
+                      <div className={`${styles.posTotalRow} ${styles.posTotalFinal}`}>
+                        <span>Toplam</span>
+                        <span>₺{posTotal.toLocaleString('tr-TR')}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      className={styles.btnPrimary}
+                      disabled={posCart.length === 0}
+                      onClick={posCheckout}
+                    >
+                      Ödemeyi Tamamla
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

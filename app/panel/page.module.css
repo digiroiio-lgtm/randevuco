@@ -1969,3 +1969,167 @@
   .crmTable th:nth-child(n+3), .crmTable td:nth-child(n+3) { display: none; }
 }
 
+
+/* ══════════════════════ POS / KASA ══════════════════════ */
+.posLayout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.posCatalog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.posSearch {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--font);
+  outline: none;
+  width: 100%;
+}
+
+.posSearch:focus { border-color: var(--accent); }
+
+.posCatGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.posCatLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.posSvcBtn {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+  gap: 8px;
+}
+
+.posSvcBtn:hover { border-color: var(--accent); background: #f3f0ff; }
+
+.posSvcName { font-size: 14px; font-weight: 600; flex: 1; }
+.posSvcMeta { font-size: 12px; color: var(--muted); }
+.posAddIcon { font-size: 20px; font-weight: 700; color: var(--accent); margin-left: 4px; }
+
+/* Cart */
+.posCart {
+  background: var(--gray-bg);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.posField { display: flex; flex-direction: column; gap: 6px; }
+.posLabel { font-size: 12px; font-weight: 700; color: var(--muted); }
+.posInput {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--white);
+  outline: none;
+}
+.posInput:focus { border-color: var(--accent); }
+
+.posEmpty { font-size: 14px; color: var(--muted); text-align: center; padding: 16px 0; }
+
+.posItems { display: flex; flex-direction: column; gap: 8px; }
+.posItem {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.posItemInfo { display: flex; justify-content: space-between; }
+.posItemName { font-size: 14px; font-weight: 600; }
+.posItemPrice { font-size: 14px; font-weight: 700; color: var(--accent); }
+.posItemActions { display: flex; align-items: center; gap: 8px; }
+.posQtyBtn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--white);
+  font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.posQtyBtn:hover { background: var(--gray-card); }
+.posQty { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
+.posRemoveBtn {
+  margin-left: auto; color: var(--muted); background: none; border: none;
+  font-size: 14px; cursor: pointer; padding: 4px;
+}
+.posRemoveBtn:hover { color: var(--red, #ef4444); }
+
+.posPaymentRow { display: flex; gap: 8px; flex-wrap: wrap; }
+.posPayBtn {
+  flex: 1; padding: 10px 8px; border: 2px solid var(--border); border-radius: 10px;
+  background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.posPayBtn:hover { border-color: var(--accent); }
+.posPayBtnActive { border-color: var(--accent); background: #f3f0ff; color: var(--accent); }
+
+.posTotalBox {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.posTotalRow { display: flex; justify-content: space-between; font-size: 14px; }
+.posDiscountVal { color: var(--green, #22c55e); font-weight: 600; }
+.posTotalFinal { font-size: 18px; font-weight: 800; padding-top: 6px; border-top: 1px solid var(--border); }
+
+/* POS success */
+.posSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px;
+  text-align: center;
+}
+.posSuccessIcon { font-size: 56px; }
+.posReceiptBox {
+  background: var(--gray-bg);
+  border-radius: 12px;
+  padding: 20px 24px;
+  text-align: left;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.posReceiptTotal { font-size: 18px; font-weight: 800; padding-top: 6px; border-top: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  .posLayout { grid-template-columns: 1fr; }
+  .posCart { position: static; }
+}

@@ -317,7 +317,7 @@ export default function PanelPage() {
 
   // Staff state
   const [staff, setStaff] = useState<StaffMember[]>(INITIAL_STAFF);
-  const [staffSubTab, setStaffSubTab] = useState<'liste' | 'performans' | 'takvim'>('liste');
+  const [staffSubTab, setStaffSubTab] = useState<'liste' | 'performans' | 'takvim' | 'vardiya'>('liste');
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [newStaff, setNewStaff] = useState<NewStaffForm>({ ...INITIAL_NEW_STAFF });
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
@@ -1302,13 +1302,13 @@ export default function PanelPage() {
 
               {/* sub-tabs */}
               <div className={styles.subTabBar}>
-                {(['liste', 'performans', 'takvim'] as const).map((st) => (
+                {(['liste', 'performans', 'takvim', 'vardiya'] as const).map((st) => (
                   <button
                     key={st}
                     className={`${styles.subTab} ${staffSubTab === st ? styles.subTabActive : ''}`}
                     onClick={() => { setStaffSubTab(st); setSelectedStaffId(null); }}
                   >
-                    {st === 'liste' ? 'Personel Listesi' : st === 'performans' ? 'Performans' : 'Takvim'}
+                    {st === 'liste' ? 'Personel Listesi' : st === 'performans' ? 'Performans' : st === 'takvim' ? 'Takvim' : 'Vardiya & Saatler'}
                   </button>
                 ))}
               </div>
@@ -1673,6 +1673,96 @@ export default function PanelPage() {
                       })}
                     </div>
                   </div>
+                </>
+              )}
+
+              {/* ─── VARDİYA & SAATLER ─── */}
+              {staffSubTab === 'vardiya' && (
+                <>
+                  <p className={styles.sectionSub}>Her personel için çalışma günlerini ve saatlerini ayarlayın</p>
+                  {staff.map((sm) => (
+                    <div key={sm.id} className={styles.block}>
+                      <div className={styles.blockHead}>
+                        <h3 className={styles.blockTitle} style={{ fontSize: 15 }}>{sm.name} — {sm.role}</h3>
+                        <span className={`${styles.statusBadge} ${sm.active ? (styles as Record<string,string>).status_onaylı : (styles as Record<string,string>).status_iptal}`}>
+                          {sm.active ? 'Aktif' : 'Pasif'}
+                        </span>
+                      </div>
+
+                      {/* Work days */}
+                      <div className={styles.vardiyaDays}>
+                        {['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'].map((day) => {
+                          const checked = sm.workDays.includes(day);
+                          return (
+                            <label key={day} className={`${styles.dayChip} ${checked ? styles.dayChipActive : ''}`}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                style={{ display: 'none' }}
+                                onChange={() =>
+                                  setStaff((prev) => prev.map((s) =>
+                                    s.id !== sm.id ? s : {
+                                      ...s,
+                                      workDays: checked
+                                        ? s.workDays.filter((d) => d !== day)
+                                        : [...s.workDays, day],
+                                    }
+                                  ))
+                                }
+                              />
+                              {day.slice(0, 3)}
+                            </label>
+                          );
+                        })}
+                      </div>
+
+                      {/* Work hours */}
+                      <div className={styles.vardiyaHours}>
+                        <div className={styles.vardiyaHourField}>
+                          <label className={styles.posLabel}>Başlangıç</label>
+                          <input
+                            type="time"
+                            className={styles.timeInput}
+                            value={sm.workStart}
+                            onChange={(e) =>
+                              setStaff((prev) => prev.map((s) =>
+                                s.id === sm.id ? { ...s, workStart: e.target.value } : s
+                              ))
+                            }
+                          />
+                        </div>
+                        <span className={styles.hoursDash}>–</span>
+                        <div className={styles.vardiyaHourField}>
+                          <label className={styles.posLabel}>Bitiş</label>
+                          <input
+                            type="time"
+                            className={styles.timeInput}
+                            value={sm.workEnd}
+                            onChange={(e) =>
+                              setStaff((prev) => prev.map((s) =>
+                                s.id === sm.id ? { ...s, workEnd: e.target.value } : s
+                              ))
+                            }
+                          />
+                        </div>
+                        <div className={styles.vardiyaHourField}>
+                          <label className={styles.posLabel}>Slot Aralığı</label>
+                          <select
+                            className={styles.timeInput}
+                            value={sm.slotInterval}
+                            onChange={(e) =>
+                              setStaff((prev) => prev.map((s) =>
+                                s.id === sm.id ? { ...s, slotInterval: e.target.value as '15' | '30' } : s
+                              ))
+                            }
+                          >
+                            <option value="15">15 dk</option>
+                            <option value="30">30 dk</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </>
               )}
 

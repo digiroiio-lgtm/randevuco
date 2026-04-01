@@ -2258,3 +2258,41 @@
   .hBarTrack { display: none; }
   .hBarCount { display: none; }
 }
+
+/* ══════════════════════ VARDİYA & SAATLER ══════════════════════ */
+.vardiyaDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dayChip {
+  padding: 6px 14px;
+  border: 2px solid var(--border);
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s, background .15s, color .15s;
+}
+
+.dayChipActive {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--white);
+}
+
+.vardiyaHours {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.vardiyaHourField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

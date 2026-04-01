@@ -69,6 +69,106 @@ const INITIAL_SERVICES: Service[] = [
   { id: 9, category: 'Bakım',        name: 'Derin Nemlendirme Maskesi', duration: '30 dk', price: '₺300',  active: true },
 ];
 
+/* ── Staff types & data ── */
+type StaffMember = {
+  id: number;
+  name: string;
+  role: string;
+  phone: string;
+  services: string[];
+  workDays: string[];
+  workStart: string;
+  workEnd: string;
+  slotInterval: '15' | '30';
+  active: boolean;
+  perf: {
+    appointments: number;
+    revenue: number;
+    avgTransaction: number;
+    utilization: number;
+  };
+  topServices: { name: string; count: number }[];
+};
+
+const ALL_STAFF_SERVICES = ['Saç Kesimi', 'Renklendirme', 'Keratin', 'Balyaj', 'Saç Botoksu'];
+const ALL_DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+const ROLES = ['Stylist', 'Senior Stylist', 'Colorist', 'Barber'];
+const SLOT_OPTIONS: ('15' | '30')[] = ['15', '30'];
+
+const INITIAL_STAFF: StaffMember[] = [
+  {
+    id: 1,
+    name: 'Serdar Zorlu',
+    role: 'Senior Stylist',
+    phone: '0532 111 22 33',
+    services: ['Saç Kesimi', 'Balyaj', 'Renklendirme'],
+    workDays: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
+    workStart: '09:00',
+    workEnd: '20:00',
+    slotInterval: '30',
+    active: true,
+    perf: { appointments: 22, revenue: 11500, avgTransaction: 523, utilization: 82 },
+    topServices: [
+      { name: 'Saç Kesimi', count: 10 },
+      { name: 'Balyaj', count: 8 },
+      { name: 'Renklendirme', count: 4 },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Selin Çelik',
+    role: 'Stylist',
+    phone: '0533 444 55 66',
+    services: ['Saç Kesimi', 'Keratin'],
+    workDays: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma'],
+    workStart: '09:00',
+    workEnd: '18:00',
+    slotInterval: '30',
+    active: true,
+    perf: { appointments: 18, revenue: 8100, avgTransaction: 450, utilization: 67 },
+    topServices: [
+      { name: 'Saç Kesimi', count: 12 },
+      { name: 'Keratin', count: 4 },
+      { name: 'Renklendirme', count: 2 },
+    ],
+  },
+];
+
+/* Calendar mock: for each hour slot & staff, optionally a customer name */
+const CALENDAR_SLOTS = [
+  { hour: '09:00', serdar: 'Ahmet Y.',   selin: 'Okan G.' },
+  { hour: '10:00', serdar: null,          selin: 'Merve K.' },
+  { hour: '11:00', serdar: 'Elif A.',     selin: null },
+  { hour: '12:00', serdar: null,          selin: null },
+  { hour: '13:00', serdar: null,          selin: 'Canan Ş.' },
+  { hour: '14:00', serdar: null,          selin: null },
+  { hour: '15:00', serdar: null,          selin: 'Tolga D.' },
+  { hour: '16:00', serdar: null,          selin: null },
+  { hour: '17:00', serdar: null,          selin: null },
+];
+
+type NewStaffForm = {
+  name: string;
+  role: string;
+  phone: string;
+  services: string[];
+  workDays: string[];
+  workStart: string;
+  workEnd: string;
+  slotInterval: '15' | '30';
+};
+
+const INITIAL_NEW_STAFF: NewStaffForm = {
+  name: '',
+  role: 'Stylist',
+  phone: '',
+  services: [],
+  workDays: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma'],
+  workStart: '09:00',
+  workEnd: '18:00',
+  slotInterval: '30',
+};
+
 const WORKING_HOURS = [
   { day: 'Pazartesi', open: '09:00', close: '20:00', closed: false },
   { day: 'Salı',      open: '09:00', close: '20:00', closed: false },
@@ -97,7 +197,7 @@ function fmtDate(iso: string) {
 /* ─────────────────────────────────────────────────────────────
    COMPONENT
 ───────────────────────────────────────────────────────────── */
-type Tab = 'genel' | 'randevular' | 'hizmetler' | 'profil' | 'ayarlar';
+type Tab = 'genel' | 'randevular' | 'hizmetler' | 'personel' | 'profil' | 'ayarlar';
 
 export default function PanelPage() {
   const [activeTab, setActiveTab] = useState<Tab>('genel');
@@ -122,6 +222,13 @@ export default function PanelPage() {
   // Notifications
   const [notif, setNotif] = useState({ sms: true, email: true, push: false, reminder24h: true, reminder2h: true });
   const [notifSaved, setNotifSaved] = useState(false);
+
+  // Staff state
+  const [staff, setStaff] = useState<StaffMember[]>(INITIAL_STAFF);
+  const [staffSubTab, setStaffSubTab] = useState<'liste' | 'performans' | 'takvim'>('liste');
+  const [showAddStaff, setShowAddStaff] = useState(false);
+  const [newStaff, setNewStaff] = useState<NewStaffForm>({ ...INITIAL_NEW_STAFF });
+  const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
 
   /* ── derived ── */
   const today = new Date().toISOString().slice(0, 10);
@@ -162,11 +269,45 @@ export default function PanelPage() {
     setTimeout(() => setNotifSaved(false), 2500);
   }
 
+  /* ── Staff handlers ── */
+  function toggleStaffCheckbox(
+    field: 'services' | 'workDays',
+    value: string,
+  ) {
+    setNewStaff((prev) => {
+      const arr = prev[field];
+      return {
+        ...prev,
+        [field]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value],
+      };
+    });
+  }
+  function saveStaff() {
+    if (!newStaff.name.trim()) return;
+    const member: StaffMember = {
+      id: Date.now(),
+      ...newStaff,
+      active: true,
+      perf: { appointments: 0, revenue: 0, avgTransaction: 0, utilization: 0 },
+      topServices: [],
+    };
+    setStaff((prev) => [...prev, member]);
+    setNewStaff({ ...INITIAL_NEW_STAFF });
+    setShowAddStaff(false);
+  }
+  function deleteStaff(id: number) {
+    setStaff((prev) => prev.filter((s) => s.id !== id));
+  }
+  function toggleStaffActive(id: number) {
+    setStaff((prev) => prev.map((s) => s.id === id ? { ...s, active: !s.active } : s));
+  }
+
   /* ── nav items ── */
   const NAV: { id: Tab; label: string; icon: string }[] = [
     { id: 'genel',      label: 'Genel Bakış',  icon: '📊' },
     { id: 'randevular', label: 'Randevular',   icon: '📅' },
     { id: 'hizmetler',  label: 'Hizmetler',    icon: '✂️' },
+    { id: 'personel',   label: 'Personel',     icon: '👥' },
     { id: 'profil',     label: 'Profil',       icon: '🏪' },
     { id: 'ayarlar',    label: 'Ayarlar',      icon: '⚙️' },
   ];
@@ -525,6 +666,388 @@ export default function PanelPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* ════════════════ PERSONEL ════════════════ */}
+          {activeTab === 'personel' && (
+            <div className={styles.section}>
+
+              {/* sub-tabs */}
+              <div className={styles.subTabBar}>
+                {(['liste', 'performans', 'takvim'] as const).map((st) => (
+                  <button
+                    key={st}
+                    className={`${styles.subTab} ${staffSubTab === st ? styles.subTabActive : ''}`}
+                    onClick={() => { setStaffSubTab(st); setSelectedStaffId(null); }}
+                  >
+                    {st === 'liste' ? 'Personel Listesi' : st === 'performans' ? 'Performans' : 'Takvim'}
+                  </button>
+                ))}
+              </div>
+
+              {/* ─── LİSTE ─── */}
+              {staffSubTab === 'liste' && (
+                <>
+                  <div className={styles.blockHead} style={{ marginBottom: 16 }}>
+                    <p className={styles.sectionSub}>{staff.filter((s) => s.active).length} aktif personel</p>
+                    <button className={styles.btnPrimary} onClick={() => setShowAddStaff(true)}>
+                      + Yeni Personel
+                    </button>
+                  </div>
+
+                  {/* add staff form */}
+                  {showAddStaff && (
+                    <div className={styles.addSvcBox} style={{ marginBottom: 24 }}>
+                      <h3 className={styles.addSvcTitle}>Yeni Personel Ekle</h3>
+                      <div className={styles.staffFormGrid}>
+
+                        <div className={styles.formField}>
+                          <label className={styles.label}>Ad Soyad <span className={styles.req}>*</span></label>
+                          <input
+                            className={styles.input}
+                            placeholder="örn. Selin Çelik"
+                            value={newStaff.name}
+                            onChange={(e) => setNewStaff((p) => ({ ...p, name: e.target.value }))}
+                          />
+                        </div>
+
+                        <div className={styles.formField}>
+                          <label className={styles.label}>Pozisyon</label>
+                          <select
+                            className={styles.select}
+                            value={newStaff.role}
+                            onChange={(e) => setNewStaff((p) => ({ ...p, role: e.target.value }))}
+                          >
+                            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                          </select>
+                        </div>
+
+                        <div className={styles.formField}>
+                          <label className={styles.label}>Telefon</label>
+                          <input
+                            className={styles.input}
+                            placeholder="05xx xxx xx xx"
+                            value={newStaff.phone}
+                            onChange={(e) => setNewStaff((p) => ({ ...p, phone: e.target.value }))}
+                          />
+                        </div>
+
+                        <div className={styles.formField}>
+                          <label className={styles.label}>Randevu Aralığı</label>
+                          <div className={styles.slotOptions}>
+                            {SLOT_OPTIONS.map((s) => (
+                              <button
+                                key={s}
+                                type="button"
+                                className={`${styles.slotBtn} ${newStaff.slotInterval === s ? styles.slotBtnActive : ''}`}
+                                onClick={() => setNewStaff((p) => ({ ...p, slotInterval: s }))}
+                              >
+                                {s} dk
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className={styles.checkGroup}>
+                          <p className={styles.label}>Uzmanlık Hizmetleri</p>
+                          <div className={styles.checkList}>
+                            {ALL_STAFF_SERVICES.map((sv) => (
+                              <label key={sv} className={styles.checkItem}>
+                                <input
+                                  type="checkbox"
+                                  checked={newStaff.services.includes(sv)}
+                                  onChange={() => toggleStaffCheckbox('services', sv)}
+                                />
+                                {sv}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className={styles.checkGroup}>
+                          <p className={styles.label}>Çalışma Günleri</p>
+                          <div className={styles.checkList}>
+                            {ALL_DAYS.map((d) => (
+                              <label key={d} className={styles.checkItem}>
+                                <input
+                                  type="checkbox"
+                                  checked={newStaff.workDays.includes(d)}
+                                  onChange={() => toggleStaffCheckbox('workDays', d)}
+                                />
+                                {d}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className={styles.formField}>
+                          <label className={styles.label}>Çalışma Saatleri</label>
+                          <div className={styles.hoursInputs}>
+                            <input
+                              type="time"
+                              className={styles.timeInput}
+                              value={newStaff.workStart}
+                              onChange={(e) => setNewStaff((p) => ({ ...p, workStart: e.target.value }))}
+                            />
+                            <span className={styles.hoursDash}>–</span>
+                            <input
+                              type="time"
+                              className={styles.timeInput}
+                              value={newStaff.workEnd}
+                              onChange={(e) => setNewStaff((p) => ({ ...p, workEnd: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+
+                      </div>
+                      <div className={styles.addSvcActions}>
+                        <button className={styles.btnBack} onClick={() => { setShowAddStaff(false); setNewStaff({ ...INITIAL_NEW_STAFF }); }}>
+                          İptal
+                        </button>
+                        <button
+                          className={styles.btnPrimary}
+                          onClick={saveStaff}
+                          disabled={!newStaff.name.trim()}
+                        >
+                          Personeli Kaydet
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* staff table */}
+                  <div className={styles.staffTable}>
+                    <div className={styles.staffTableHead}>
+                      <span>Personel</span>
+                      <span>Rol</span>
+                      <span className={styles.hideOnMobile}>Hizmetler</span>
+                      <span>Durum</span>
+                      <span />
+                    </div>
+                    {staff.map((sm) => (
+                      <div key={sm.id} className={styles.staffRow}>
+                        <div className={styles.staffRowName}>
+                          <div className={styles.staffAvatar}>{sm.name.charAt(0)}</div>
+                          <div>
+                            <p className={styles.staffName}>{sm.name}</p>
+                            <p className={styles.staffPhone}>{sm.phone}</p>
+                          </div>
+                        </div>
+                        <span className={styles.staffRole}>{sm.role}</span>
+                        <span className={`${styles.staffServices} ${styles.hideOnMobile}`}>
+                          {sm.services.join(', ') || '—'}
+                        </span>
+                        <span>
+                          <span className={`${styles.statusBadge} ${sm.active ? styles.status_onaylı : styles.status_iptal}`}>
+                            {sm.active ? 'Aktif' : 'Pasif'}
+                          </span>
+                        </span>
+                        <div className={styles.staffRowActions}>
+                          <button
+                            className={`${styles.toggleBtn} ${sm.active ? styles.toggleOn : ''}`}
+                            onClick={() => toggleStaffActive(sm.id)}
+                            aria-label={sm.active ? 'Pasife al' : 'Aktife al'}
+                          >
+                            <span className={styles.toggleKnob} />
+                          </button>
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => deleteStaff(sm.id)}
+                            aria-label="Sil"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* ─── PERFORMANS ─── */}
+              {staffSubTab === 'performans' && (
+                <>
+                  {selectedStaffId === null ? (
+                    <>
+                      <p className={styles.sectionSub}>Bu Ay — Genel Performans Tablosu</p>
+                      <div className={styles.perfTable}>
+                        <div className={styles.perfTableHead}>
+                          <span>Personel</span>
+                          <span>Randevu</span>
+                          <span>Ciro</span>
+                          <span className={styles.hideOnMobile}>Ort. İşlem</span>
+                          <span>Doluluk</span>
+                        </div>
+                        {staff.map((sm) => (
+                          <button
+                            key={sm.id}
+                            className={styles.perfRow}
+                            onClick={() => setSelectedStaffId(sm.id)}
+                          >
+                            <div className={styles.perfRowName}>
+                              <div className={styles.staffAvatar}>{sm.name.charAt(0)}</div>
+                              <span>{sm.name}</span>
+                            </div>
+                            <span className={styles.perfVal}>{sm.perf.appointments}</span>
+                            <span className={styles.perfVal}>₺{sm.perf.revenue.toLocaleString('tr-TR')}</span>
+                            <span className={`${styles.perfVal} ${styles.hideOnMobile}`}>₺{sm.perf.avgTransaction}</span>
+                            <span className={styles.perfVal}>
+                              <span className={styles.utilizationBar}>
+                                <span
+                                  className={styles.utilizationFill}
+                                  style={{ width: `${sm.perf.utilization}%` }}
+                                />
+                              </span>
+                              %{sm.perf.utilization}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    (() => {
+                      const sm = staff.find((s) => s.id === selectedStaffId)!;
+                      const todaySchedule = APPOINTMENTS.filter(
+                        (a) => a.date === today && a.staff === sm.name && a.status !== 'iptal',
+                      );
+                      return (
+                        <div>
+                          <button
+                            className={styles.backBtn}
+                            onClick={() => setSelectedStaffId(null)}
+                          >
+                            ← Geri
+                          </button>
+
+                          {/* header */}
+                          <div className={styles.staffDetailHeader}>
+                            <div className={styles.staffDetailAvatar}>{sm.name.charAt(0)}</div>
+                            <div>
+                              <p className={styles.staffDetailName}>{sm.name}</p>
+                              <p className={styles.staffDetailRole}>{sm.role}</p>
+                            </div>
+                          </div>
+
+                          {/* perf stats */}
+                          <div className={styles.statsGrid} style={{ marginTop: 20 }}>
+                            <div className={styles.statCard}>
+                              <span className={styles.statIcon}>📅</span>
+                              <div>
+                                <p className={styles.statValue}>{sm.perf.appointments}</p>
+                                <p className={styles.statLabel}>Randevu Sayısı</p>
+                              </div>
+                            </div>
+                            <div className={styles.statCard}>
+                              <span className={styles.statIcon}>💰</span>
+                              <div>
+                                <p className={styles.statValue}>₺{sm.perf.revenue.toLocaleString('tr-TR')}</p>
+                                <p className={styles.statLabel}>Toplam Ciro</p>
+                              </div>
+                            </div>
+                            <div className={styles.statCard}>
+                              <span className={styles.statIcon}>📊</span>
+                              <div>
+                                <p className={styles.statValue}>₺{sm.perf.avgTransaction}</p>
+                                <p className={styles.statLabel}>Ortalama İşlem</p>
+                              </div>
+                            </div>
+                            <div className={styles.statCard}>
+                              <span className={styles.statIcon}>⏱️</span>
+                              <div>
+                                <p className={styles.statValue}>%{sm.perf.utilization}</p>
+                                <p className={styles.statLabel}>Doluluk Oranı</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* top services */}
+                          <div className={styles.block} style={{ marginTop: 20 }}>
+                            <h2 className={styles.blockTitle}>En Çok Yaptığı Hizmetler</h2>
+                            <div className={styles.topSvcTable}>
+                              <div className={styles.topSvcHead}>
+                                <span>Hizmet</span><span>Adet</span>
+                              </div>
+                              {sm.topServices.map((ts) => (
+                                <div key={ts.name} className={styles.topSvcRow}>
+                                  <span>{ts.name}</span>
+                                  <span className={styles.topSvcCount}>{ts.count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* today's schedule */}
+                          <div className={styles.block} style={{ marginTop: 16 }}>
+                            <h2 className={styles.blockTitle}>Günlük Program — Bugün</h2>
+                            {todaySchedule.length === 0 ? (
+                              <p className={styles.empty}>Bugün randevu yok.</p>
+                            ) : (
+                              <div className={styles.dailyTable}>
+                                <div className={styles.dailyHead}>
+                                  <span>Saat</span><span>Müşteri</span><span>Hizmet</span>
+                                </div>
+                                {todaySchedule.map((a) => (
+                                  <div key={a.id} className={styles.dailyRow}>
+                                    <span className={styles.dailyTime}>{a.time}</span>
+                                    <span>{a.customer}</span>
+                                    <span className={styles.dailyService}>{a.service}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()
+                  )}
+                </>
+              )}
+
+              {/* ─── TAKVİM ─── */}
+              {staffSubTab === 'takvim' && (
+                <>
+                  <p className={styles.sectionSub}>Bugün — Tüm Personel Programı</p>
+                  <div className={styles.calendarWrap}>
+                    <div
+                      className={styles.calendarGrid}
+                      style={{ gridTemplateColumns: `60px repeat(${staff.length}, 1fr)` }}
+                    >
+                      {/* header row */}
+                      <div className={styles.calCell} />
+                      {staff.map((sm) => (
+                        <div key={sm.id} className={`${styles.calCell} ${styles.calHeader}`}>
+                          <div className={styles.staffAvatar} style={{ margin: '0 auto 4px' }}>{sm.name.charAt(0)}</div>
+                          <span>{sm.name.split(' ')[0]}</span>
+                        </div>
+                      ))}
+                      {/* slot rows */}
+                      {CALENDAR_SLOTS.map((slot) => {
+                        const cells: (string | null)[] = staff.map((sm) => {
+                          const appt = APPOINTMENTS.find(
+                            (a) => a.date === today && a.time === slot.hour && a.staff === sm.name && a.status !== 'iptal',
+                          );
+                          return appt ? appt.customer : null;
+                        });
+                        return (
+                          <>
+                            <div key={`h-${slot.hour}`} className={styles.calTimeCell}>{slot.hour}</div>
+                            {cells.map((cell, ci) => (
+                              <div
+                                key={`c-${slot.hour}-${ci}`}
+                                className={`${styles.calCell} ${cell ? styles.calCellBooked : styles.calCellFree}`}
+                              >
+                                {cell ?? <span className={styles.calFreeText}>Boş</span>}
+                              </div>
+                            ))}
+                          </>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+
             </div>
           )}
 

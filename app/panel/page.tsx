@@ -33,7 +33,7 @@ type Appointment = {
   time: string;
   duration: string;
   price: string;
-  status: 'bekliyor' | 'onaylı' | 'tamamlandı' | 'iptal' | 'noshow';
+  status: 'bekliyor' | 'onaylı' | 'tamamlandı' | 'iptal' | 'gelmedi';
   phone?: string;
 };
 
@@ -218,7 +218,7 @@ const STATUS_LABEL: Record<Appointment['status'], string> = {
   onaylı:     'Onaylı',
   tamamlandı: 'Tamamlandı',
   iptal:      'İptal',
-  noshow:     'No-show',
+  gelmedi:    'Gelmedi',
 };
 
 function fmtDate(iso: string) {
@@ -267,7 +267,11 @@ function getMonthCells(isoDate: string): (string | null)[] {
   return cells;
 }
 
-const DAY_SLOTS: string[] = Array.from({ length: 24 }, (_, i) => minToTime(8 * 60 + i * 30));
+// DAY_START/DAY_END define the visible hour range; slots are 30-min increments
+const DAY_START_HOUR = 8;
+const DAY_END_HOUR = 20;
+const SLOTS_PER_DAY = (DAY_END_HOUR - DAY_START_HOUR) * 2; // 24 slots × 30 min
+const DAY_SLOTS: string[] = Array.from({ length: SLOTS_PER_DAY }, (_, i) => minToTime(DAY_START_HOUR * 60 + i * 30));
 const WEEK_HOURS: string[] = Array.from({ length: 12 }, (_, i) => `${String(8 + i).padStart(2, '0')}:00`);
 const TR_DAYS_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
@@ -412,8 +416,8 @@ export default function PanelPage() {
   function approveAppt(id: number) {
     setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'onaylı' as const } : a));
   }
-  function noshowAppt(id: number) {
-    setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'noshow' as const } : a));
+  function gelmediAppt(id: number) {
+    setAppointments((prev) => prev.map((a) => a.id === id ? { ...a, status: 'gelmedi' as const } : a));
     // Decrease trust score for the customer
     const appt = appointments.find((a) => a.id === id);
     if (appt) {
@@ -673,7 +677,7 @@ export default function PanelPage() {
                 <>
                   <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
                     <div className={styles.filterBar} style={{ margin: 0 }}>
-                      {(['tümü', 'bekliyor', 'onaylı', 'tamamlandı', 'iptal', 'noshow'] as const).map((f) => (
+                      {(['tümü', 'bekliyor', 'onaylı', 'tamamlandı', 'iptal', 'gelmedi'] as const).map((f) => (
                         <button
                           key={f}
                           className={`${styles.filterPill} ${apptFilter === f ? styles.filterPillActive : ''}`}
@@ -726,7 +730,7 @@ export default function PanelPage() {
                               <button className={styles.btnApprove} onClick={() => approveAppt(a.id)}>Onayla</button>
                             )}
                             {a.status === 'onaylı' && (
-                              <button className={styles.btnNoshow} onClick={() => noshowAppt(a.id)}>No-show</button>
+                              <button className={styles.btnNoshow} onClick={() => gelmediAppt(a.id)}>Gelmedi</button>
                             )}
                             <span className={styles.apptCardPrice}>{a.price}</span>
                           </div>
@@ -816,7 +820,7 @@ export default function PanelPage() {
                                   className={[
                                     styles.apptBlock,
                                     a.status === 'bekliyor' ? styles.apptBlockPending : '',
-                                    a.status === 'noshow' ? styles.apptBlockNoshow : '',
+                                    a.status === 'gelmedi' ? styles.apptBlockGelmedi : '',
                                   ].join(' ')}
                                   style={{ position: 'absolute', top: topPx, height: heightPx, left: 4, right: 4 }}
                                   draggable

@@ -416,7 +416,7 @@
 .status_onaylı     { background: #d1fae5; color: #065f46; }
 .status_tamamlandı { background: #dbeafe; color: #1e40af; }
 .status_iptal      { background: #fee2e2; color: #991b1b; }
-.status_noshow     { background: #fed7aa; color: #9a3412; }
+.status_gelmedi     { background: #fed7aa; color: #9a3412; }
 
 /* ── QUICK ACTIONS ── */
 .quickActions {
@@ -1745,7 +1745,7 @@
 .apptBlock:active { cursor: grabbing; }
 
 .apptBlockPending { background: #f59e0b !important; }
-.apptBlockNoshow  { background: #9ca3af !important; }
+.apptBlockGelmedi  { background: #9ca3af !important; }
 
 /* ─────────────────────────────────────────────────────
    WEEK VIEW

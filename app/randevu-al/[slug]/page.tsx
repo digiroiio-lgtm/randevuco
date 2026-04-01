@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import BookingFlow from '@/components/BookingFlow';
-import { allVenues } from '@/lib/data';
+import type { BookingServiceItem, BookingStaffMember } from '@/components/BookingFlow';
+import { allVenues, venueDetails } from '@/lib/data';
 import styles from './page.module.css';
 
 type Props = {
@@ -28,6 +29,32 @@ export default async function BookingPage({ params }: Props) {
   const { slug } = await params;
   const venue = allVenues.find((v) => v.slug === slug);
   if (!venue) notFound();
+
+  const detail = venueDetails[slug];
+
+  /* Build typed service list from venue detail if available */
+  const serviceList: BookingServiceItem[] | undefined = detail?.serviceCategories
+    .flatMap((cat) =>
+      cat.items.map((item, idx) => {
+        const durationMin = parseInt(item.duration) || 30;
+        const priceNum    = parseInt(item.price.replace(/\D/g, '')) || 0;
+        return {
+          id:          `${cat.name}-${idx}`,
+          name:        item.name,
+          duration:    item.duration,
+          durationMin,
+          price:       item.price,
+          priceNum,
+        };
+      })
+    );
+
+  /* Build typed staff list from venue detail if available */
+  const staffList: BookingStaffMember[] | undefined = detail?.staff?.map((sm) => ({
+    name:  sm.name,
+    title: sm.title,
+    img:   sm.img,
+  }));
 
   return (
     <>
@@ -66,7 +93,7 @@ export default async function BookingPage({ params }: Props) {
             </div>
 
             <div className={styles.right}>
-              <BookingFlow venue={venue} />
+              <BookingFlow venue={venue} serviceList={serviceList} staffList={staffList} />
             </div>
           </div>
         </div>

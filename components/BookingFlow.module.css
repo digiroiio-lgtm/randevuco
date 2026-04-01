@@ -7,25 +7,38 @@
   margin: 0 auto;
 }
 
-.steps {
+/* ── Step bar ── */
+.stepBar {
   display: flex;
   align-items: center;
-  gap: 12px;
   margin-bottom: 28px;
+  gap: 0;
+}
+
+.stepBarItem {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.stepBarItem:last-child {
+  flex: none;
 }
 
 .stepDot {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   background: var(--gray-card);
   color: var(--muted);
   transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 
 .stepDot.active {
@@ -33,15 +46,52 @@
   color: var(--white);
 }
 
+.stepDot.done {
+  background: var(--green, #22c55e);
+  color: var(--white);
+  font-size: 11px;
+}
+
+.stepLabel {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 5px;
+  white-space: nowrap;
+}
+
+.stepLabelActive {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 4px;
+  min-width: 12px;
+}
+
+.stepLineDone {
+  background: var(--green, #22c55e);
+}
+
 .section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
+  margin: 0;
+}
+
+.sectionSub {
+  font-size: 13px;
+  color: var(--muted);
+  margin: -8px 0 0;
 }
 
 .serviceList {
@@ -61,6 +111,7 @@
   font-size: 14px;
   transition: border-color 0.15s, background 0.15s;
   text-align: left;
+  cursor: pointer;
 }
 
 .serviceItem:hover {
@@ -72,6 +123,32 @@
   background: #f3f0ff;
 }
 
+.serviceLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.checkboxChecked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .serviceName {
   font-weight: 600;
 }
@@ -79,6 +156,91 @@
 .serviceMeta {
   font-size: 12px;
   color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── Basket bar ── */
+.basket {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--accent);
+  color: var(--white);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+}
+
+.basketInfo {
+  font-weight: 500;
+}
+
+.basketTotal {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* ── Staff grid ── */
+.staffGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.staffCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.staffCard:hover {
+  border-color: var(--accent);
+}
+
+.staffCard.selected {
+  border-color: var(--accent);
+  background: #f3f0ff;
+}
+
+.staffAvatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--gray-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.staffAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.staffName {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.staffTitle {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
 }
 
 .dateList {
@@ -169,8 +331,41 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   font-size: 14px;
+}
+
+.summaryTitle {
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.summaryServices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.summaryTotal {
+  font-weight: 700;
+  font-size: 16px;
+  padding-top: 4px;
 }
 
 .navRow {
@@ -227,7 +422,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--green, #22c55e);
   color: var(--white);
   font-size: 28px;
   display: flex;
@@ -238,6 +433,26 @@
 .successTitle {
   font-size: 22px;
   font-weight: 700;
+  margin: 0;
+}
+
+.successSummary {
+  background: var(--gray-bg);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.successNote {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
 }
 
 .successText {

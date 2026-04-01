@@ -20,12 +20,29 @@ export type BookingStaffMember = {
   img?: string;
 };
 
+export type BookingAddon = {
+  id: string;
+  name: string;
+  durationMin: number;
+  price: string;
+  priceNum: number;
+};
+
 type Props = {
   venue: Venue;
   serviceList?: BookingServiceItem[];
   staffList?: BookingStaffMember[];
+  addonList?: BookingAddon[];
   busySlots?: string[]; /* time strings that are fully booked on today's date */
 };
+
+const DEFAULT_ADDONS: BookingAddon[] = [
+  { id: 'a1', name: 'Saç Yıkama',         durationMin: 10, price: '₺50',  priceNum: 50 },
+  { id: 'a2', name: 'Saç Kurutma',         durationMin: 15, price: '₺75',  priceNum: 75 },
+  { id: 'a3', name: 'Saç Maskesi',         durationMin: 20, price: '₺100', priceNum: 100 },
+  { id: 'a4', name: 'Kaş Şekillendirme',  durationMin: 15, price: '₺80',  priceNum: 80 },
+  { id: 'a5', name: 'Çay / Kahve İkramı', durationMin: 0,  price: '₺0',   priceNum: 0 },
+];
 
 const DEFAULT_SERVICES: BookingServiceItem[] = [
   { id: 's1', name: 'Saç Kesimi',     duration: '45 dk', durationMin: 45, price: '₺250', priceNum: 250 },
@@ -70,19 +87,21 @@ function formatDuration(mins: number) {
   return m > 0 ? `${h} sa ${m} dk` : `${h} sa`;
 }
 
-const STEP_LABELS = ['Hizmetler', 'Personel', 'Tarih & Saat', 'Onayla'];
+const STEP_LABELS = ['Hizmetler', 'Eklentiler', 'Personel', 'Tarih & Saat', 'Onayla'];
 
 /* Demo busy slots — in production these would come from real availability API */
 const DEMO_BUSY = ['09:30', '10:30', '14:00'];
 
-export default function BookingFlow({ venue, serviceList, staffList, busySlots }: Props) {
+export default function BookingFlow({ venue, serviceList, staffList, addonList, busySlots }: Props) {
   const router = useRouter();
   const services = serviceList ?? DEFAULT_SERVICES;
   const staff    = staffList    ?? DEFAULT_STAFF;
+  const addons   = addonList    ?? DEFAULT_ADDONS;
   const busy     = busySlots    ?? DEMO_BUSY;
 
   const [step, setStep]                   = useState(1);
   const [selectedIds, setSelectedIds]     = useState<string[]>([]);
+  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<string>('any');
   const [selectedDate, setSelectedDate]   = useState(getTodayStr());
   const [selectedTime, setSelectedTime]   = useState('');
@@ -94,9 +113,18 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
   const [waitlistDone, setWaitlistDone]   = useState(false);
 
   const dates = getFutureDates(14);
-  const chosenServices  = services.filter((s) => selectedIds.includes(s.id));
-  const totalPrice      = chosenServices.reduce((sum, s) => sum + s.priceNum, 0);
-  const totalDurationMin = chosenServices.reduce((sum, s) => sum + s.durationMin, 0);
+  const chosenServices    = services.filter((s) => selectedIds.includes(s.id));
+  const chosenAddons      = addons.filter((a) => selectedAddonIds.includes(a.id));
+  const totalPrice        = chosenServices.reduce((sum, s) => sum + s.priceNum, 0)
+                          + chosenAddons.reduce((sum, a) => sum + a.priceNum, 0);
+  const totalDurationMin  = chosenServices.reduce((sum, s) => sum + s.durationMin, 0)
+                          + chosenAddons.reduce((sum, a) => sum + a.durationMin, 0);
+
+  function toggleAddon(id: string) {
+    setSelectedAddonIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }
 
   function toggleService(id: string) {
     setSelectedIds((prev) =>
@@ -220,8 +248,43 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
         </div>
       )}
 
-      {/* ── Step 2: Staff selection ── */}
+      {/* ── Step 2: Add-ons ── */}
       {step === 2 && (
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Eklentiler</h2>
+          <p className={styles.sectionSub}>İsteğe bağlı ekstra hizmetler (opsiyonel)</p>
+          <div className={styles.serviceList}>
+            {addons.map((a) => {
+              const checked = selectedAddonIds.includes(a.id);
+              return (
+                <button
+                  key={a.id}
+                  className={`${styles.serviceItem} ${checked ? styles.selected : ''}`}
+                  onClick={() => toggleAddon(a.id)}
+                  aria-pressed={checked}
+                >
+                  <div className={styles.serviceLeft}>
+                    <div className={`${styles.checkbox} ${checked ? styles.checkboxChecked : ''}`}>
+                      {checked && <span>✓</span>}
+                    </div>
+                    <span className={styles.serviceName}>{a.name}</span>
+                  </div>
+                  <span className={styles.serviceMeta}>
+                    {a.durationMin > 0 ? `+${a.durationMin} dk · ` : ''}{a.price || 'Ücretsiz'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className={styles.navRow}>
+            <button className={styles.btnOutline} onClick={() => setStep(1)}>Geri</button>
+            <button className={styles.btn} onClick={() => setStep(3)}>Devam Et</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Step 3: Staff selection ── */}
+      {step === 3 && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Personel Seçin</h2>
           <p className={styles.sectionSub}>Tercih ettiğiniz personeli seçin</p>
@@ -255,14 +318,14 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
           </div>
 
           <div className={styles.navRow}>
-            <button className={styles.btnOutline} onClick={() => setStep(1)}>Geri</button>
-            <button className={styles.btn} onClick={() => setStep(3)}>Devam Et</button>
+            <button className={styles.btnOutline} onClick={() => setStep(2)}>Geri</button>
+            <button className={styles.btn} onClick={() => setStep(4)}>Devam Et</button>
           </div>
         </div>
       )}
 
-      {/* ── Step 3: Date & time ── */}
-      {step === 3 && (
+      {/* ── Step 4: Date & time ── */}
+      {step === 4 && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Tarih &amp; Saat Seçin</h2>
           <div className={styles.dateList}>
@@ -316,11 +379,11 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
             </div>
           )}
           <div className={styles.navRow}>
-            <button className={styles.btnOutline} onClick={() => setStep(2)}>Geri</button>
+            <button className={styles.btnOutline} onClick={() => setStep(3)}>Geri</button>
             <button
               className={styles.btn}
               disabled={!selectedTime || waitlistMode}
-              onClick={() => setStep(4)}
+              onClick={() => setStep(5)}
             >
               Devam Et
             </button>
@@ -328,8 +391,8 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
         </div>
       )}
 
-      {/* ── Step 4: Contact + confirm ── */}
-      {step === 4 && (
+      {/* ── Step 5: Contact + confirm ── */}
+      {step === 5 && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>İletişim &amp; Onayla</h2>
           <form onSubmit={handleConfirm} className={styles.form}>
@@ -375,6 +438,17 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
                     <span>{s.price}</span>
                   </div>
                 ))}
+                {chosenAddons.length > 0 && (
+                  <>
+                    <p className={styles.summaryTitle} style={{ marginTop: 4 }}>+ Eklentiler</p>
+                    {chosenAddons.map((a) => (
+                      <div key={a.id} className={styles.summaryRow}>
+                        <span>{a.name}</span>
+                        <span>{a.priceNum > 0 ? a.price : 'Ücretsiz'}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
               <div className={styles.summaryDivider} />
               <div className={styles.summaryRow}>
@@ -396,7 +470,7 @@ export default function BookingFlow({ venue, serviceList, staffList, busySlots }
             </div>
 
             <div className={styles.navRow}>
-              <button type="button" className={styles.btnOutline} onClick={() => setStep(3)}>Geri</button>
+              <button type="button" className={styles.btnOutline} onClick={() => setStep(4)}>Geri</button>
               <button type="submit" className={styles.btn}>Randevu Al</button>
             </div>
           </form>

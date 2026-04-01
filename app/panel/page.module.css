@@ -2296,3 +2296,27 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* ══════════════════════ WAİTLİST ══════════════════════ */
+.waitlistTable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.waitlistRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.waitlistPhone {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}

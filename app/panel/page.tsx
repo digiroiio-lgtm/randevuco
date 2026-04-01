@@ -37,6 +37,20 @@ type Appointment = {
   phone?: string;
 };
 
+type WaitlistEntry = {
+  id: number;
+  customer: string;
+  phone: string;
+  service: string;
+  date: string;
+  preferredTime: string;
+};
+
+const INITIAL_WAITLIST: WaitlistEntry[] = [
+  { id: 1, customer: 'Seda Koç',    phone: '0532 111 22 33', service: 'Saç Kesimi',   date: '2026-04-01', preferredTime: '09:30' },
+  { id: 2, customer: 'Fatih Arslan', phone: '0544 333 44 55', service: 'Renklendirme', date: '2026-04-01', preferredTime: '10:30' },
+];
+
 const APPOINTMENTS_DATA: Appointment[] = [
   { id: 1, customer: 'Ahmet Yılmaz',   service: 'Saç Kesimi',         staff: 'Serdar Zorlu',  date: '2026-04-01', time: '09:00', duration: '45 dk', price: '₺350', status: 'onaylı' },
   { id: 2, customer: 'Merve Kaya',     service: 'Renklendirme',       staff: 'Serdar Zorlu',  date: '2026-04-01', time: '10:30', duration: '90 dk', price: '₺800', status: 'onaylı' },
@@ -324,6 +338,7 @@ export default function PanelPage() {
 
   // Appointments state
   const [appointments, setAppointments] = useState<Appointment[]>(APPOINTMENTS_DATA);
+  const [waitlist, setWaitlist]         = useState<WaitlistEntry[]>(INITIAL_WAITLIST);
 
   // Calendar / booking views
   const [randevuView, setRandevuView] = useState<'liste' | 'gun' | 'hafta' | 'ay'>('liste');
@@ -970,6 +985,57 @@ export default function PanelPage() {
                       ))
                     )}
                   </div>
+
+                  {/* ── Waitlist block (shown only in liste view) ── */}
+                  {waitlist.length > 0 && (
+                    <div className={styles.block} style={{ marginTop: 16 }}>
+                      <div className={styles.blockHead}>
+                        <h2 className={styles.blockTitle}>⏳ Bekleme Listesi</h2>
+                        <span className={styles.sectionSub}>{waitlist.length} kişi bekliyor</span>
+                      </div>
+                      <div className={styles.waitlistTable}>
+                        {waitlist.map((w) => (
+                          <div key={w.id} className={styles.waitlistRow}>
+                            <div className={styles.apptAvatar}>{w.customer.charAt(0)}</div>
+                            <div className={styles.apptMeta} style={{ flex: 1 }}>
+                              <p className={styles.apptCustomer}>{w.customer}</p>
+                              <p className={styles.apptService}>{w.service} · tercih: {w.preferredTime}</p>
+                            </div>
+                            <span className={styles.waitlistPhone}>{w.phone}</span>
+                            <button
+                              className={styles.btnApprove}
+                              onClick={() => {
+                                /* Convert to appointment */
+                                const newAppt: Appointment = {
+                                  id:       Date.now(),
+                                  customer: w.customer,
+                                  service:  w.service,
+                                  staff:    staff[0]?.name ?? 'Bilinmiyor',
+                                  date:     w.date,
+                                  time:     w.preferredTime,
+                                  duration: '45 dk',
+                                  price:    '₺0',
+                                  status:   'bekliyor',
+                                  phone:    w.phone,
+                                };
+                                setAppointments((prev) => [newAppt, ...prev]);
+                                setWaitlist((prev) => prev.filter((x) => x.id !== w.id));
+                              }}
+                            >
+                              Randevuya Dönüştür
+                            </button>
+                            <button
+                              className={styles.dangerBtn}
+                              style={{ padding: '6px 12px', fontSize: 12 }}
+                              onClick={() => setWaitlist((prev) => prev.filter((x) => x.id !== w.id))}
+                            >
+                              Çıkar
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
 

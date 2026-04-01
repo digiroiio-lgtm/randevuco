@@ -24,6 +24,7 @@ type Props = {
   venue: Venue;
   serviceList?: BookingServiceItem[];
   staffList?: BookingStaffMember[];
+  busySlots?: string[]; /* time strings that are fully booked on today's date */
 };
 
 const DEFAULT_SERVICES: BookingServiceItem[] = [
@@ -71,10 +72,14 @@ function formatDuration(mins: number) {
 
 const STEP_LABELS = ['Hizmetler', 'Personel', 'Tarih & Saat', 'Onayla'];
 
-export default function BookingFlow({ venue, serviceList, staffList }: Props) {
+/* Demo busy slots — in production these would come from real availability API */
+const DEMO_BUSY = ['09:30', '10:30', '14:00'];
+
+export default function BookingFlow({ venue, serviceList, staffList, busySlots }: Props) {
   const router = useRouter();
   const services = serviceList ?? DEFAULT_SERVICES;
   const staff    = staffList    ?? DEFAULT_STAFF;
+  const busy     = busySlots    ?? DEMO_BUSY;
 
   const [step, setStep]                   = useState(1);
   const [selectedIds, setSelectedIds]     = useState<string[]>([]);
@@ -85,6 +90,8 @@ export default function BookingFlow({ venue, serviceList, staffList }: Props) {
   const [phone, setPhone]                 = useState('');
   const [note, setNote]                   = useState('');
   const [confirmed, setConfirmed]         = useState(false);
+  const [waitlistMode, setWaitlistMode]   = useState(false);   /* true when user chose a busy slot */
+  const [waitlistDone, setWaitlistDone]   = useState(false);
 
   const dates = getFutureDates(14);
   const chosenServices  = services.filter((s) => selectedIds.includes(s.id));
@@ -100,6 +107,25 @@ export default function BookingFlow({ venue, serviceList, staffList }: Props) {
   function handleConfirm(e: React.FormEvent) {
     e.preventDefault();
     setConfirmed(true);
+  }
+
+  /* ── Waitlist done screen ── */
+  if (waitlistDone) {
+    return (
+      <div className={styles.success}>
+        <div className={styles.successIcon} style={{ background: '#f59e0b' }}>⏳</div>
+        <h2 className={styles.successTitle}>Bekleme Listesine Eklendiniz!</h2>
+        <div className={styles.successSummary}>
+          <p><strong>İşletme:</strong> {venue.name}</p>
+          <p><strong>Hizmetler:</strong> {chosenServices.map((s) => s.name).join(', ')}</p>
+          <p><strong>Tercih edilen saat:</strong> {selectedTime}</p>
+        </div>
+        <p className={styles.successNote}>Slot müsait olduğunda SMS ile bilgilendirileceksiniz.</p>
+        <button className={styles.btn} onClick={() => router.push('/')}>
+          Ana Sayfaya Dön
+        </button>
+      </div>
+    );
   }
 
   /* ── Success screen ── */
@@ -254,21 +280,46 @@ export default function BookingFlow({ venue, serviceList, staffList }: Props) {
             Toplam süre: {formatDuration(totalDurationMin)}
           </p>
           <div className={styles.timeGrid}>
-            {BASE_TIMES.map((t) => (
-              <button
-                key={t}
-                className={`${styles.timeBtn} ${selectedTime === t ? styles.selected : ''}`}
-                onClick={() => setSelectedTime(t)}
-              >
-                {t}
-              </button>
-            ))}
+            {BASE_TIMES.map((t) => {
+              const isBusy = busy.includes(t);
+              return (
+                <button
+                  key={t}
+                  className={`${styles.timeBtn} ${selectedTime === t ? styles.selected : ''} ${isBusy ? styles.timeBtnBusy : ''}`}
+                  onClick={() => {
+                    if (isBusy) {
+                      setSelectedTime(t);
+                      setWaitlistMode(true);
+                    } else {
+                      setSelectedTime(t);
+                      setWaitlistMode(false);
+                    }
+                  }}
+                >
+                  {isBusy ? `${t} 🔴` : t}
+                </button>
+              );
+            })}
           </div>
+
+          {/* Waitlist CTA when a busy slot is selected */}
+          {waitlistMode && selectedTime && (
+            <div className={styles.waitlistBox}>
+              <p className={styles.waitlistTitle}>⏳ Bu saat dolu</p>
+              <p className={styles.waitlistDesc}>
+                <strong>{selectedTime}</strong> saati için bekleme listesine eklenebilirsiniz.
+                Slot açıldığında SMS ile bildirim alırsınız.
+              </p>
+              <button className={styles.btnWaitlist} onClick={() => setWaitlistDone(true)}>
+                Bekleme Listesine Ekle
+              </button>
+            </div>
+          )}
           <div className={styles.navRow}>
             <button className={styles.btnOutline} onClick={() => setStep(2)}>Geri</button>
             <button
               className={styles.btn}
-              disabled={!selectedTime}
+              disabled={!selectedTime || waitlistMode}
               onClick={() => setStep(4)}
             >
               Devam Et

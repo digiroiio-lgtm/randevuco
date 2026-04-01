@@ -176,7 +176,7 @@ export default function ForBusinessPage() {
               İşletmeniz için basit, esnek ve güçlü rezervasyon yazılımı.
             </p>
             <div className={styles.heroCtas}>
-              <Link href="#pricing" className={styles.btnPrimary}>
+              <Link href="/isletme-kayit" className={styles.btnPrimary}>
                 Hemen Başlayın
               </Link>
               <Link href="#features" className={styles.btnSecondary}>
@@ -273,7 +273,7 @@ export default function ForBusinessPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="#pricing" className={styles.btnPrimary}>
+                <Link href="/isletme-kayit" className={styles.btnPrimary}>
                   Hemen Başlayın
                 </Link>
               </div>
@@ -415,7 +415,7 @@ export default function ForBusinessPage() {
               <p className={styles.ctaText}>
                 Randevu. ile iş ortaklığı yapın ve işletmenizi bugün büyütmeye başlayın.
               </p>
-              <Link href="#pricing" className={styles.btnPrimaryLg}>
+              <Link href="/isletme-kayit" className={styles.btnPrimaryLg}>
                 Hemen Başlayın
               </Link>
               <p className={styles.heroNote} style={{ marginTop: '12px' }}>

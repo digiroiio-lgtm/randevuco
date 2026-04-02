@@ -23,10 +23,10 @@ export default function HomePage() {
         <section className={styles.hero}>
           <div className={styles.heroInner}>
             <h1 className={styles.heroTitle}>
-              Yerel bakım hizmetlerini<br />rezerve et
+              Yakınındaki en iyi bakım uzmanlarını<br />keşfet ve anında randevu al
             </h1>
             <p className={styles.heroSub}>
-              Dünya genelinde milyonlarca kişinin güvendiği en iyi salonları, kuaförleri, medspaları, wellness stüdyolarını ve güzellik uzmanlarını keşfedin.
+              Kuaförlerden medspalara kadar binlerce salonu keşfet. Gerçek müşteri yorumlarını gör, müsait saatleri kontrol et ve saniyeler içinde randevu oluştur.
             </p>
             <SearchBar />
             <BookingCounter />

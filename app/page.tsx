@@ -133,7 +133,16 @@ export default function HomePage() {
 
       <footer className={styles.footer}>
         <div className={styles.container}>
-          <p>© 2024 Randevu. Tüm hakları saklıdır.</p>
+          <p>© 2025 Randevu.co Ltd · Company Number: 14876900 · 71-75 Shelton Street, London WC2H 9JQ</p>
+          <nav className={styles.footerLegal}>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/cookies">Cookie Policy</Link>
+            <Link href="/refund-policy">Refund Policy</Link>
+            <Link href="/business-terms">Business Terms</Link>
+            <Link href="/acceptable-use">Acceptable Use</Link>
+            <Link href="/contact">Contact</Link>
+          </nav>
         </div>
       </footer>
     </>
